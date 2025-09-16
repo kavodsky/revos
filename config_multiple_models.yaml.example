@@ -1,0 +1,114 @@
+# Example configuration with multiple LLM models
+# This file demonstrates how to configure multiple LLM models
+# for different use cases and performance requirements.
+
+revo:
+  # Required: Your Revo API credentials
+  client_id: "your_revo_client_id_here"
+  client_secret: "your_revo_client_secret_here"
+  
+  # Optional: Revo API endpoints (defaults shown)
+  token_url: "https://your-site.com/revo/oauth/token"
+  base_url: "https://your-site.com/revo/llm-api"
+  
+  # Token management settings
+  token_buffer_minutes: 5  # Refresh token 5 minutes before expiration
+  max_retries: 3           # Maximum retry attempts for token requests
+  request_timeout: 30      # Request timeout in seconds
+
+# Single LLM configuration (for backward compatibility)
+llm:
+  model: "gpt-3.5-turbo"
+  temperature: 0.1
+  max_tokens: 1000
+  top_p: 1.0
+  frequency_penalty: 0.0
+  presence_penalty: 0.0
+
+# Multiple LLM models configuration
+llm_models:
+  # Available models with their specific configurations
+  models:
+    # Fast and cost-effective model for general tasks
+    gpt-3.5-turbo:
+      model: "gpt-3.5-turbo"
+      temperature: 0.1
+      max_tokens: 1000
+      top_p: 1.0
+      frequency_penalty: 0.0
+      presence_penalty: 0.0
+      description: "Fast and cost-effective model for general tasks"
+      custom_params: {}
+    
+    # Most capable model for complex tasks
+    gpt-4:
+      model: "gpt-4"
+      temperature: 0.1
+      max_tokens: 2000
+      top_p: 1.0
+      frequency_penalty: 0.0
+      presence_penalty: 0.0
+      description: "Most capable model for complex tasks"
+      custom_params: {}
+    
+    # Latest GPT-4 model with extended context
+    gpt-4-turbo:
+      model: "gpt-4-turbo"
+      temperature: 0.1
+      max_tokens: 4000
+      top_p: 1.0
+      frequency_penalty: 0.0
+      presence_penalty: 0.0
+      description: "Latest GPT-4 model with extended context"
+      custom_params: {}
+    
+    # Creative model for brainstorming and ideation
+    creative:
+      model: "gpt-4"
+      temperature: 0.8
+      max_tokens: 2000
+      top_p: 0.9
+      frequency_penalty: 0.3
+      presence_penalty: 0.3
+      description: "Creative model for brainstorming and ideation"
+      custom_params: {}
+    
+    # Analytical model for data analysis and reasoning
+    analytical:
+      model: "gpt-4"
+      temperature: 0.0
+      max_tokens: 3000
+      top_p: 1.0
+      frequency_penalty: 0.0
+      presence_penalty: 0.0
+      description: "Analytical model for data analysis and reasoning"
+      custom_params: {}
+    
+    # Claude model (if supported by your API)
+    claude-3:
+      model: "claude-3-sonnet"
+      temperature: 0.1
+      max_tokens: 2000
+      top_p: 1.0
+      frequency_penalty: 0.0
+      presence_penalty: 0.0
+      description: "Anthropic's Claude 3 model"
+      custom_params: {}
+
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "/tmp/revo.log"
+  max_size: 10485760  # 10MB
+  backup_count: 5
+
+# Token management configuration
+token_manager:
+  refresh_interval_minutes: 45
+  max_failures_before_fallback: 1
+  enable_periodic_refresh: true
+  enable_fallback: true
+
+# Global settings
+debug: false

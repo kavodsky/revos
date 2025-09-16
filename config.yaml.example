@@ -1,0 +1,43 @@
+# Revo Library Configuration Example
+# Copy this file to config.yaml and modify the values as needed
+
+revo:
+  # Required: Your Revo API credentials
+  client_id: "your_revo_client_id_here"
+  client_secret: "your_revo_client_secret_here"
+  
+  # Optional: Revo API endpoints (defaults shown)
+  token_url: "https://your-site.com/revo/oauth/token"
+  base_url: "https://your-site.com/revo/llm-api"
+  
+  # Token management settings
+  token_buffer_minutes: 5  # Refresh token 5 minutes before expiration
+  max_retries: 3           # Maximum retry attempts for token requests
+  request_timeout: 30      # Request timeout in seconds
+
+llm:
+  # LLM model settings
+  model: "gpt-3.5-turbo"   # Model to use for LLM operations
+  temperature: 0.1         # Temperature for text generation (0.0-2.0)
+  max_tokens: 1024         # Maximum tokens to generate (optional)
+  top_p: 1.0              # Top-p sampling parameter (0.0-1.0)
+  frequency_penalty: 0.0   # Frequency penalty (-2.0 to 2.0)
+  presence_penalty: 0.0    # Presence penalty (-2.0 to 2.0)
+
+logging:
+  # Logging configuration
+  level: "INFO"            # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "/tmp/revo.log"    # Log file path (optional, set to null to disable)
+  max_size: 10485760       # Maximum log file size in bytes (10MB)
+  backup_count: 5          # Number of backup log files to keep
+
+token_manager:
+  # Token manager settings
+  refresh_interval_minutes: 45  # How often to refresh tokens (minutes)
+  max_failures_before_fallback: 1  # Failures before switching to fallback method
+  enable_periodic_refresh: true    # Enable automatic periodic refresh
+  enable_fallback: true            # Enable fallback authentication method
+
+# Global settings
+debug: false  # Enable debug mode (overrides log level to DEBUG)
