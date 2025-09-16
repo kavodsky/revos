@@ -44,7 +44,8 @@ class LangChainExtractor:
             token = self.token_manager.get_token()
             
             # Get LLM configuration
-            if self.model_name and hasattr(self.settings, 'llm_models'):
+            if (self.model_name and hasattr(self.settings, 'llm_models') and 
+                self.model_name in self.settings.llm_models.models):
                 # Use specific model from multiple models configuration
                 llm_config = self.settings.llm_models.get_model(self.model_name)
             else:

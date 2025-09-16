@@ -396,7 +396,7 @@ asyncio.run(extract_person_info())
 
 #### 2.1. Using Custom Settings with get_langchain_extractor
 
-The `get_langchain_extractor()` function now supports custom settings instances, allowing you to use different environment variable prefixes (like APOLLO_ instead of REVOS_):
+The `get_langchain_extractor()` function now supports custom settings instances, allowing you to use different environment variable prefixes (like RUMBA_ instead of REVOS_):
 
 ```python
 from revos import get_langchain_extractor, create_config_with_prefixes
@@ -411,9 +411,9 @@ class ProductReview(BaseModel):
     key_features: list[str]
 
 async def extract_with_custom_settings():
-    # Create custom configuration with APOLLO_ prefix
+    # Create custom configuration with RUMBA_ prefix
     config = create_config_with_prefixes(
-        revo_prefix="RUMBA_",      # Use APOLLO_ prefix instead of REVOS_
+        revo_prefix="RUMBA_",      # Use RUMBA_ prefix instead of REVOS_
         llm_prefix="LLM_",          # Use LLM_ prefix for LLM settings
         logging_prefix="LOG_",      # Use LOG_ prefix for logging
         token_prefix="TOKEN_"       # Use TOKEN_ prefix for token management
@@ -440,7 +440,7 @@ asyncio.run(extract_with_custom_settings())
 - **Default behavior**: `get_langchain_extractor("model_name")` uses global settings with REVOS_ prefix
 - **Custom settings**: `get_langchain_extractor("model_name", settings_instance=config)` uses your custom configuration
 - **Backward compatibility**: Existing code continues to work without changes
-- **Flexible prefixes**: Use any prefix you want (APOLLO_, CUSTOM_, etc.) for different environments
+- **Flexible prefixes**: Use any prefix you want (RUMBA_, CUSTOM_, etc.) for different environments
 
 #### 3. Multiple Models Configuration
 
@@ -1321,7 +1321,7 @@ get_langchain_extractor(model_name: str, settings_instance=None) -> LangChainExt
 # Use with default global settings (REVOS_ prefix)
 extractor = get_langchain_extractor('claude_4_sonnet')
 
-# Use with custom settings (e.g., APOLLO_ prefix)
+# Use with custom settings (e.g., RUMBA_ prefix)
 config = create_config_with_prefixes(revo_prefix="RUMBA_")
 extractor = get_langchain_extractor('claude_4_sonnet', settings_instance=config)
 ```
@@ -1330,7 +1330,7 @@ extractor = get_langchain_extractor('claude_4_sonnet', settings_instance=config)
 - **Caching**: Returns cached instances for better performance
 - **Backward Compatibility**: Existing code continues to work without changes
 - **Custom Settings**: Supports custom environment variable prefixes
-- **Flexible Configuration**: Use any prefix you want (APOLLO_, CUSTOM_, etc.)
+- **Flexible Configuration**: Use any prefix you want (RUMBA_, CUSTOM_, etc.)
 
 ### TokenManager
 

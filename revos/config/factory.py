@@ -5,12 +5,13 @@ This module provides factory functions for creating configurations
 with custom settings, prefixes, and other options.
 """
 
-from typing import Optional, Dict, Any
+from typing import Optional
 from pydantic import Field
 from pydantic_settings import SettingsConfigDict
 
 from .api import RevosConfig
 from .llm import LLMConfig
+from .llm_models import LLMModelsConfig
 from .logging import LoggingConfig
 from .token import TokenManagerConfig
 from .main import RevosMainConfig
@@ -86,10 +87,20 @@ def create_config_with_prefixes(
             extra="ignore"
         )
     
+    class CustomLLMModelsConfig(LLMModelsConfig):
+        model_config = SettingsConfigDict(
+            env_prefix="LLM_MODELS_",
+            env_file=".env",
+            env_file_encoding="utf-8",
+            case_sensitive=False,
+            extra="ignore"
+        )
+    
     # Create the main config with custom nested configs
     class CustomRevosMainConfig(RevosMainConfig):
         revos: CustomRevosConfig = Field(default_factory=CustomRevosConfig)
         llm: CustomLLMConfig = Field(default_factory=CustomLLMConfig)
+        llm_models: CustomLLMModelsConfig = Field(default_factory=CustomLLMModelsConfig)
         logging: CustomLoggingConfig = Field(default_factory=CustomLoggingConfig)
         token_manager: CustomTokenManagerConfig = Field(default_factory=CustomTokenManagerConfig)
         
@@ -103,6 +114,8 @@ def create_config_with_prefixes(
                     kwargs['revos'] = CustomRevosConfig(_env_file=env_file)
                 if 'llm' not in kwargs:
                     kwargs['llm'] = CustomLLMConfig(_env_file=env_file)
+                if 'llm_models' not in kwargs:
+                    kwargs['llm_models'] = CustomLLMModelsConfig(_env_file=env_file)
                 if 'logging' not in kwargs:
                     kwargs['logging'] = CustomLoggingConfig(_env_file=env_file)
                 if 'token_manager' not in kwargs:
