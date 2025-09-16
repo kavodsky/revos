@@ -394,6 +394,54 @@ async def extract_person_info():
 asyncio.run(extract_person_info())
 ```
 
+#### 2.1. Using Custom Settings with get_langchain_extractor
+
+The `get_langchain_extractor()` function now supports custom settings instances, allowing you to use different environment variable prefixes (like APOLLO_ instead of REVOS_):
+
+```python
+from revos import get_langchain_extractor, create_config_with_prefixes
+from langchain_core.prompts import PromptTemplate
+from pydantic import BaseModel
+import asyncio
+
+class ProductReview(BaseModel):
+    product_name: str
+    rating: int
+    sentiment: str
+    key_features: list[str]
+
+async def extract_with_custom_settings():
+    # Create custom configuration with APOLLO_ prefix
+    config = create_config_with_prefixes(
+        revo_prefix="RUMBA_",      # Use APOLLO_ prefix instead of REVOS_
+        llm_prefix="LLM_",          # Use LLM_ prefix for LLM settings
+        logging_prefix="LOG_",      # Use LOG_ prefix for logging
+        token_prefix="TOKEN_"       # Use TOKEN_ prefix for token management
+    )
+    
+    # Get extractor with custom settings
+    extractor = get_langchain_extractor("claude_4_sonnet", settings_instance=config)
+    
+    # Extract structured data using custom configuration
+    result = await extractor.extract(
+        target=ProductReview,
+        prompt="Analyze this product review: 'This laptop is amazing! Great battery life and fast performance. 5/5 stars.'",
+        text="This laptop is amazing! Great battery life and fast performance. 5/5 stars."
+    )
+    
+    print(f"Extracted with custom settings: {result}")
+    return result
+
+# Run the extraction
+asyncio.run(extract_with_custom_settings())
+```
+
+**Key Points:**
+- **Default behavior**: `get_langchain_extractor("model_name")` uses global settings with REVOS_ prefix
+- **Custom settings**: `get_langchain_extractor("model_name", settings_instance=config)` uses your custom configuration
+- **Backward compatibility**: Existing code continues to work without changes
+- **Flexible prefixes**: Use any prefix you want (APOLLO_, CUSTOM_, etc.) for different environments
+
 #### 3. Multiple Models Configuration
 
 ```python
@@ -1250,6 +1298,39 @@ Extracts structured data using LangChain and LLM.
 
 - `extract(target, prompt, **kwargs)`: Extract structured data using LLM
 - `_refresh_llm(use_fallback=False)`: Refresh LLM with new token
+
+### Functions
+
+#### get_langchain_extractor
+
+Get a LangChain extractor instance for a specific model.
+
+```python
+get_langchain_extractor(model_name: str, settings_instance=None) -> LangChainExtractor
+```
+
+**Parameters:**
+- `model_name` (str): Name of the model to use (e.g., 'claude_4_sonnet', 'gpt-4')
+- `settings_instance` (optional): Custom settings instance to use. If None, uses global settings from environment variables with default REVOS_ prefix
+
+**Returns:**
+- `LangChainExtractor`: Extractor instance for the specified model
+
+**Examples:**
+```python
+# Use with default global settings (REVOS_ prefix)
+extractor = get_langchain_extractor('claude_4_sonnet')
+
+# Use with custom settings (e.g., APOLLO_ prefix)
+config = create_config_with_prefixes(revo_prefix="RUMBA_")
+extractor = get_langchain_extractor('claude_4_sonnet', settings_instance=config)
+```
+
+**Key Features:**
+- **Caching**: Returns cached instances for better performance
+- **Backward Compatibility**: Existing code continues to work without changes
+- **Custom Settings**: Supports custom environment variable prefixes
+- **Flexible Configuration**: Use any prefix you want (APOLLO_, CUSTOM_, etc.)
 
 ### TokenManager
 

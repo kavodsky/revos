@@ -228,18 +228,32 @@ class LangChainExtractor:
 _langchain_extractors: Dict[str, LangChainExtractor] = {}
 
 
-def get_langchain_extractor(model_name: str) -> LangChainExtractor:
+def get_langchain_extractor(model_name: str, settings_instance=None) -> LangChainExtractor:
     """
     Get a LangChain extractor instance for a specific model.
     
+    This function provides a convenient way to get a cached LangChain extractor instance.
+    You can use it with custom settings (e.g., custom prefixes) or with default global settings.
+    
     Args:
-        model_name: Name of the model to use.
+        model_name: Name of the model to use (e.g., 'claude_4_sonnet', 'gpt-4').
+        settings_instance: Optional settings instance to use. If None, uses global settings
+            from environment variables with default REVOS_ prefix. If provided, uses the
+            custom configuration (e.g., with RUMBA_ prefix).
         
     Returns:
         LangChainExtractor: Extractor instance for the specified model
         
     Raises:
         ValueError: If model_name is not provided
+        
+    Examples:
+        # Use with default global settings (REVOS_ prefix)
+        extractor = get_langchain_extractor('claude_4_sonnet')
+        
+        # Use with custom settings (e.g., RUMBA_ prefix)
+        config = create_config_with_prefixes(revo_prefix="RUMBA_")
+        extractor = get_langchain_extractor('claude_4_sonnet', settings_instance=config)
     """
     if not model_name:
         raise ValueError("model_name is required to get LangChainExtractor")
@@ -248,7 +262,10 @@ def get_langchain_extractor(model_name: str) -> LangChainExtractor:
     
     # Create extractor if it doesn't exist
     if model_name not in _langchain_extractors:
-        _langchain_extractors[model_name] = LangChainExtractor(model_name=model_name)
+        _langchain_extractors[model_name] = LangChainExtractor(
+            model_name=model_name,
+            settings_instance=settings_instance
+        )
     
     return _langchain_extractors[model_name]
 
