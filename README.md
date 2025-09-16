@@ -1,16 +1,16 @@
-# Revo
+# Revos
 
-A Python library for Revo API authentication and LangChain-based LLM tools with support for multiple LLM models and robust configuration management.
+A Python library for Revos API authentication and LangChain-based LLM tools with support for multiple LLM models and robust configuration management.
 
 ## Features
 
-- **🔐 Revo API Authentication**: Dual authentication methods with automatic fallback
+- **🔐 Revos API Authentication**: Dual authentication methods with automatic fallback
 - **🤖 LangChain Integration**: Structured data extraction using LLMs
 - **⚙️ Multiple LLM Models**: Support for multiple models with different configurations
 - **🔄 Token Management**: Automatic token refresh with configurable intervals
 - **🛡️ Robust Error Handling**: Comprehensive retry logic and fallback mechanisms
 - **🔧 Flexible Configuration**: Environment variables, YAML, JSON, and programmatic configuration
-- **📊 OpenAI-Compatible**: Works with OpenAI-compatible APIs through Revo
+- **📊 OpenAI-Compatible**: Works with OpenAI-compatible APIs through Revos
 - **🧪 Comprehensive Testing**: Full test suite with pytest
 - **📚 Rich Examples**: Multiple usage examples and configuration patterns
 
@@ -34,23 +34,23 @@ pip install -e ".[dev]"
 
 ## Configuration
 
-The Revo library uses `pydantic_settings` for robust configuration management. You can configure the library in several ways:
+The Revos library uses `pydantic_settings` for robust configuration management. You can configure the library in several ways:
 
 ### 1. Environment Variables
 
 Set the following environment variables:
 
 ```bash
-# Required Revo credentials
-export REVO_CLIENT_ID="your_client_id"
-export REVO_CLIENT_SECRET="your_client_secret"
+# Required Revos credentials
+export REVOS_CLIENT_ID="your_client_id"
+export REVOS_CLIENT_SECRET="your_client_secret"
 
-# Optional Revo settings
-export REVO_TOKEN_URL="https://your-site.com/revo/oauth/token"
-export REVO_BASE_URL="https://your-site.com/revo/llm-api"
-export REVO_TOKEN_BUFFER_MINUTES="5"
-export REVO_MAX_RETRIES="3"
-export REVO_REQUEST_TIMEOUT="30"
+# Optional Revos settings
+export REVOS_TOKEN_URL="https://your-site.com/revo/oauth/token"
+export REVOS_BASE_URL="https://your-site.com/revo/llm-api"
+export REVOS_TOKEN_BUFFER_MINUTES="5"
+export REVOS_MAX_RETRIES="3"
+export REVOS_REQUEST_TIMEOUT="30"
 
 # LLM settings
 export LLM_MODEL="gpt-3.5-turbo"
@@ -160,10 +160,10 @@ Create a `config.json` file:
 Create a `.env` file:
 
 ```env
-REVO_CLIENT_ID=your_client_id
-REVO_CLIENT_SECRET=your_client_secret
-REVO_TOKEN_URL=https://your-site.com/revo/oauth/token
-REVO_BASE_URL=https://your-site.com/revo/llm-api
+REVOS_CLIENT_ID=your_client_id
+REVOS_CLIENT_SECRET=your_client_secret
+REVOS_TOKEN_URL=https://your-site.com/revo/oauth/token
+REVOS_BASE_URL=https://your-site.com/revo/llm-api
 LLM_MODEL=gpt-3.5-turbo
 LLM_TEMPERATURE=0.1
 LOG_LEVEL=INFO
@@ -174,11 +174,11 @@ DEBUG=false
 ### 3. Programmatic Configuration
 
 ```python
-from revo import RevoMainConfig, RevoConfig, LLMConfig, LoggingConfig, TokenManagerConfig
+from revos import RevosMainConfig, RevosConfig, LLMConfig, LoggingConfig, TokenManagerConfig
 
 # Create custom configuration
-config = RevoMainConfig(
-    revo=RevoConfig(
+config = RevosMainConfig(
+    revo=RevosConfig(
         client_id="your_client_id",
         client_secret="your_client_secret",
         token_url="https://your-site.com/revo/oauth/token",
@@ -212,9 +212,9 @@ config = RevoMainConfig(
 )
 
 # Use the configuration
-from revo import RevoTokenManager, LangChainExtractor
+from revos import RevosTokenManager, LangChainExtractor
 
-token_manager = RevoTokenManager(settings_instance=config)
+token_manager = RevosTokenManager(settings_instance=config)
 extractor = LangChainExtractor(settings_instance=config)
 ```
 
@@ -223,11 +223,11 @@ extractor = LangChainExtractor(settings_instance=config)
 If you need to use different environment variable prefixes (e.g., to avoid conflicts or follow your organization's naming conventions), you can use the `create_config_with_prefixes()` function:
 
 ```python
-from revo import create_config_with_prefixes
+from revos import create_config_with_prefixes
 
 # Create configuration with custom prefixes
 config = create_config_with_prefixes(
-    revo_prefix="MY_API_",      # Instead of "REVO_"
+    revo_prefix="MY_API_",      # Instead of "REVOS_"
     llm_prefix="AI_",           # Instead of "LLM_"
     logging_prefix="APP_",      # Instead of "LOG_"
     token_prefix="AUTH_",       # Instead of "TOKEN_"
@@ -243,7 +243,7 @@ config = create_config_with_prefixes(
 **Use Cases for Custom Prefixes:**
 - **Avoid Conflicts**: When you have existing environment variables with the default prefixes
 - **Organization Standards**: Follow your company's naming conventions
-- **Multiple Instances**: Run multiple Revo configurations in the same environment
+- **Multiple Instances**: Run multiple Revos configurations in the same environment
 - **Minimal Prefixes**: Use shorter prefixes for simplicity
 
 **Example with Custom Environment Variables:**
@@ -261,20 +261,20 @@ export APP_LOG_LEVEL="INFO"
 ### Basic Authentication
 
 ```python
-from revo import get_revo_token, RevoTokenManager
+from revos import get_revo_token, RevosTokenManager
 
 # Get a token using the global token manager
 token = get_revo_token()
 
 # Or create your own token manager
-token_manager = RevoTokenManager()
+token_manager = RevosTokenManager()
 token = token_manager.get_token()
 ```
 
 ### Structured Data Extraction
 
 ```python
-from revo import LangChainExtractor
+from revos import LangChainExtractor
 from langchain_core.prompts import PromptTemplate
 from pydantic import BaseModel
 
@@ -308,7 +308,7 @@ print(result.age)   # 30
 ### Token Management
 
 ```python
-from revo import TokenManager
+from revos import TokenManager
 import asyncio
 
 # Create a token manager with 45-minute refresh interval
@@ -335,14 +335,14 @@ asyncio.run(main())
 #### 1. Simple Authentication and Token Management
 
 ```python
-from revo import get_revo_token, RevoTokenManager
+from revos import get_revo_token, RevosTokenManager
 
 # Get a token using the global token manager
 token = get_revo_token()
 print(f"Token: {token[:20]}...")
 
 # Create your own token manager with custom settings
-token_manager = RevoTokenManager()
+token_manager = RevosTokenManager()
 token = token_manager.get_token(force_refresh=True)
 print(f"Fresh token: {token[:20]}...")
 
@@ -353,7 +353,7 @@ token_manager.invalidate_token()
 #### 2. Single Model Data Extraction
 
 ```python
-from revo import get_langchain_extractor
+from revos import get_langchain_extractor
 from langchain_core.prompts import PromptTemplate
 from pydantic import BaseModel
 import asyncio
@@ -397,7 +397,7 @@ asyncio.run(extract_person_info())
 #### 3. Multiple Models Configuration
 
 ```python
-from revo import RevoMainConfig, list_available_extractors, get_langchain_extractor
+from revos import RevosMainConfig, list_available_extractors, get_langchain_extractor
 from langchain_core.prompts import PromptTemplate
 from pydantic import BaseModel
 
@@ -419,7 +419,7 @@ Analyze the following product review and extract structured information:
 prompt = PromptTemplate(template=template, input_variables=["review"])
 
 # Load configuration with multiple models
-config = RevoMainConfig.from_file('config_multiple_models.yaml')
+config = RevosMainConfig.from_file('config_multiple_models.yaml')
 
 # List available models
 available_models = list_available_extractors(config)
@@ -459,7 +459,7 @@ asyncio.run(analyze_review())
 #### 4. Custom Model Configurations
 
 ```python
-from revo import RevoMainConfig, LLMModelConfig, LLMModelsConfig
+from revos import RevosMainConfig, LLMModelConfig, LLMModelsConfig
 from langchain_core.prompts import PromptTemplate
 from pydantic import BaseModel
 
@@ -481,8 +481,8 @@ Create a creative story based on these elements:
 prompt = PromptTemplate(template=template, input_variables=["story_elements"])
 
 # Create custom configuration with specialized models
-config = RevoMainConfig(
-    revo=RevoConfig(
+config = RevosMainConfig(
+    revo=RevosConfig(
         client_id="your_client_id",
         client_secret="your_client_secret"
     ),
@@ -534,7 +534,7 @@ asyncio.run(create_story())
 #### 5. Error Handling and Fallbacks
 
 ```python
-from revo import get_langchain_extractor, RevoAuthenticationError, RevoAPIError
+from revos import get_langchain_extractor, RevosAuthenticationError, RevosAPIError
 from langchain_core.prompts import PromptTemplate
 from pydantic import BaseModel
 import asyncio
@@ -560,11 +560,11 @@ async def robust_extraction():
         
         print(f"Extracted: {result.value} (confidence: {result.confidence})")
         
-    except RevoAuthenticationError as e:
+    except RevosAuthenticationError as e:
         print(f"Authentication failed: {e}")
         print("Please check your credentials and try again.")
         
-    except RevoAPIError as e:
+    except RevosAPIError as e:
         print(f"API error: {e}")
         print("The API might be temporarily unavailable.")
         
@@ -578,7 +578,7 @@ asyncio.run(robust_extraction())
 #### 6. Background Token Refresh
 
 ```python
-from revo import BackgroundTokenManager
+from revos import BackgroundTokenManager
 import asyncio
 import signal
 import sys
@@ -616,15 +616,15 @@ asyncio.run(main())
 #### 7. Configuration Management
 
 ```python
-from revo import RevoMainConfig, create_config_with_prefixes
+from revos import RevosMainConfig, create_config_with_prefixes
 import os
 
 # Example 1: Load from YAML file
-config = RevoMainConfig.from_file('config.yaml')
+config = RevosMainConfig.from_file('config.yaml')
 print("Loaded from YAML:", config.llm_models.list_available_models())
 
 # Example 2: Load from JSON file
-config = RevoMainConfig.from_file('config.json')
+config = RevosMainConfig.from_file('config.json')
 print("Loaded from JSON:", config.llm_models.list_available_models())
 
 # Example 3: Custom environment variable prefixes
@@ -641,15 +641,15 @@ config.save_to_file('my_config.json', format='json')
 
 # Example 5: Environment-specific configuration
 if os.getenv('ENVIRONMENT') == 'production':
-    config = RevoMainConfig.from_file('config.prod.yaml')
+    config = RevosMainConfig.from_file('config.prod.yaml')
 else:
-    config = RevoMainConfig.from_file('config.dev.yaml')
+    config = RevosMainConfig.from_file('config.dev.yaml')
 ```
 
 #### 8. Batch Processing with Multiple Models
 
 ```python
-from revo import get_langchain_extractor, list_available_extractors
+from revos import get_langchain_extractor, list_available_extractors
 from langchain_core.prompts import PromptTemplate
 from pydantic import BaseModel
 import asyncio
@@ -670,7 +670,7 @@ prompt = PromptTemplate(template=template, input_variables=["text"])
 
 async def batch_analysis():
     # Load configuration
-    config = RevoMainConfig.from_file('config_multiple_models.yaml')
+    config = RevosMainConfig.from_file('config_multiple_models.yaml')
     
     # Get available models
     available_models = list_available_extractors(config)
@@ -709,11 +709,11 @@ asyncio.run(batch_analysis())
 #### 1. Custom Environment Variable Prefixes
 
 ```python
-from revo import create_config_with_prefixes
+from revos import create_config_with_prefixes
 
 # Create configuration with custom prefixes
 config = create_config_with_prefixes(
-    revo_prefix="MY_API_",      # Instead of "REVO_"
+    revo_prefix="MY_API_",      # Instead of "REVOS_"
     llm_prefix="AI_",           # Instead of "LLM_"
     logging_prefix="APP_",      # Instead of "LOG_"
     token_prefix="AUTH_",       # Instead of "TOKEN_"
@@ -729,11 +729,11 @@ config = create_config_with_prefixes(
 #### 2. Programmatic Configuration
 
 ```python
-from revo import RevoMainConfig, RevoConfig, LLMConfig, LLMModelConfig, LLMModelsConfig
+from revos import RevosMainConfig, RevosConfig, LLMConfig, LLMModelConfig, LLMModelsConfig
 
 # Create configuration programmatically
-config = RevoMainConfig(
-    revo=RevoConfig(
+config = RevosMainConfig(
+    revo=RevosConfig(
         client_id="your_client_id",
         client_secret="your_client_secret",
         token_url="https://your-site.com/revo/oauth/token",
@@ -758,13 +758,414 @@ config = RevoMainConfig(
 )
 ```
 
+## FastAPI Integration
+
+The Revos library integrates seamlessly with FastAPI applications. Here are several patterns for integrating Revos into your FastAPI projects:
+
+### Basic FastAPI Integration
+
+```python
+from fastapi import FastAPI, HTTPException, Depends
+from revos import (
+    RevosMainConfig, 
+    get_revos_token, 
+    LangChainExtractor,
+    RevosTokenError
+)
+from pydantic import BaseModel
+from typing import Optional
+from contextlib import asynccontextmanager
+
+# Global extractor instance
+extractor: Optional[LangChainExtractor] = None
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Initialize the Revos extractor on startup."""
+    global extractor
+    try:
+        # Initialize with your preferred model
+        extractor = LangChainExtractor(model_name="gpt-4")
+        print("✅ Revos extractor initialized successfully")
+    except Exception as e:
+        print(f"❌ Failed to initialize Revos extractor: {e}")
+        raise
+    
+    yield
+    
+    # Cleanup (if needed)
+    print("🔄 Revos extractor cleanup completed")
+
+app = FastAPI(title="Revos FastAPI Integration", lifespan=lifespan)
+
+@app.get("/")
+async def root():
+    return {"message": "Revos FastAPI Integration"}
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint."""
+    if extractor is None:
+        raise HTTPException(status_code=503, detail="Revos extractor not initialized")
+    
+    try:
+        # Test token availability
+        token = get_revos_token()
+        return {
+            "status": "healthy",
+            "revos_connected": True,
+            "token_available": bool(token)
+        }
+    except RevosTokenError:
+        return {
+            "status": "degraded", 
+            "revos_connected": False,
+            "token_available": False
+        }
+```
+
+### Dependency Injection Pattern
+
+```python
+from fastapi import FastAPI, Depends, HTTPException
+from revos import LangChainExtractor, get_revos_token, RevosTokenError
+from functools import lru_cache
+
+app = FastAPI()
+
+@lru_cache()
+def get_extractor() -> LangChainExtractor:
+    """Dependency to get the Revos extractor."""
+    try:
+        return LangChainExtractor(model_name="gpt-4")
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Failed to initialize Revos extractor: {e}"
+        )
+
+def get_valid_token():
+    """Dependency to ensure we have a valid token."""
+    try:
+        token = get_revos_token()
+        if not token:
+            raise HTTPException(status_code=401, detail="No valid token available")
+        return token
+    except RevosTokenError as e:
+        raise HTTPException(status_code=401, detail=f"Token error: {e}")
+
+@app.get("/extract")
+async def extract_data(
+    prompt: str,
+    extractor: LangChainExtractor = Depends(get_extractor),
+    token: str = Depends(get_valid_token)
+):
+    """Extract structured data using Revos."""
+    from pydantic import BaseModel
+    
+    class ExtractedData(BaseModel):
+        summary: str
+        confidence: float
+        key_points: list[str]
+    
+    try:
+        result = extractor.extract_structured_data(
+            prompt=prompt,
+            target_class=ExtractedData
+        )
+        return {"extracted_data": result.dict()}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Extraction failed: {e}")
+```
+
+### Advanced Integration with Background Token Management
+
+```python
+from fastapi import FastAPI, BackgroundTasks
+from revos import (
+    RevosMainConfig,
+    TokenManager,
+    LangChainExtractor,
+    get_revos_token
+)
+from contextlib import asynccontextmanager
+from typing import Optional
+
+# Global instances
+token_manager: Optional[TokenManager] = None
+extractor: Optional[LangChainExtractor] = None
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manage application lifespan with proper cleanup."""
+    global token_manager, extractor
+    
+    # Startup
+    try:
+        # Initialize token manager with background refresh
+        token_manager = TokenManager(refresh_interval_minutes=30)
+        
+        # Start background token refresh service
+        await token_manager.start_background_service()
+        
+        # Initialize extractor
+        extractor = LangChainExtractor(model_name="gpt-4")
+        
+        print("✅ Revos services started successfully")
+        
+    except Exception as e:
+        print(f"❌ Failed to start Revos services: {e}")
+        raise
+    
+    yield
+    
+    # Shutdown
+    if token_manager:
+        await token_manager.stop_background_service()
+        print("✅ Revos services stopped")
+
+app = FastAPI(lifespan=lifespan)
+
+@app.get("/token-status")
+async def get_token_status():
+    """Get current token status and refresh information."""
+    if not token_manager:
+        raise HTTPException(status_code=503, detail="Token manager not initialized")
+    
+    return {
+        "background_service_running": token_manager.is_background_service_running(),
+        "last_refresh_time": token_manager.get_last_refresh_time(),
+        "should_refresh": token_manager.should_refresh_token(),
+        "current_token_available": bool(get_revos_token())
+    }
+
+@app.post("/force-refresh")
+async def force_token_refresh():
+    """Force a token refresh."""
+    if not token_manager:
+        raise HTTPException(status_code=503, detail="Token manager not initialized")
+    
+    success = token_manager.force_refresh()
+    return {"refresh_successful": success}
+```
+
+### Error Handling and Middleware
+
+```python
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import JSONResponse
+from revos import RevosTokenError, RevosAuthenticationError, RevosAPIError
+
+app = FastAPI()
+
+@app.exception_handler(RevosTokenError)
+async def revos_token_error_handler(request: Request, exc: RevosTokenError):
+    """Handle Revos token errors."""
+    return JSONResponse(
+        status_code=401,
+        content={
+            "error": "Token Error",
+            "message": str(exc),
+            "type": "REVOS_TOKEN_ERROR"
+        }
+    )
+
+@app.exception_handler(RevosAuthenticationError)
+async def revos_auth_error_handler(request: Request, exc: RevosAuthenticationError):
+    """Handle Revos authentication errors."""
+    return JSONResponse(
+        status_code=401,
+        content={
+            "error": "Authentication Error", 
+            "message": str(exc),
+            "type": "REVOS_AUTH_ERROR"
+        }
+    )
+
+@app.exception_handler(RevosAPIError)
+async def revos_api_error_handler(request: Request, exc: RevosAPIError):
+    """Handle Revos API errors."""
+    return JSONResponse(
+        status_code=502,
+        content={
+            "error": "API Error",
+            "message": str(exc), 
+            "type": "REVOS_API_ERROR"
+        }
+    )
+```
+
+### Complete FastAPI Application Example
+
+```python
+from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks
+from revos import (
+    RevosMainConfig,
+    LangChainExtractor, 
+    TokenManager,
+    get_revos_token,
+    RevosTokenError
+)
+from pydantic import BaseModel
+from typing import List, Optional
+from contextlib import asynccontextmanager
+
+# Data models
+class DocumentSummary(BaseModel):
+    title: str
+    summary: str
+    key_points: List[str]
+    confidence: float
+
+class SentimentAnalysis(BaseModel):
+    sentiment: str  # positive, negative, neutral
+    confidence: float
+    reasoning: str
+
+# Global instances
+token_manager: Optional[TokenManager] = None
+extractor: Optional[LangChainExtractor] = None
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan management."""
+    global token_manager, extractor
+    
+    # Startup
+    token_manager = TokenManager(refresh_interval_minutes=30)
+    await token_manager.start_background_service()
+    extractor = LangChainExtractor(model_name="gpt-4")
+    
+    yield
+    
+    # Shutdown
+    if token_manager:
+        await token_manager.stop_background_service()
+
+app = FastAPI(
+    title="Revos FastAPI Integration",
+    description="FastAPI application with Revos LLM integration",
+    lifespan=lifespan
+)
+
+@app.get("/")
+async def root():
+    return {"message": "Revos FastAPI Integration", "status": "running"}
+
+@app.post("/summarize")
+async def summarize_document(
+    text: str,
+    background_tasks: BackgroundTasks
+):
+    """Summarize a document using Revos."""
+    try:
+        result = extractor.extract_structured_data(
+            prompt=f"Summarize this document: {text}",
+            target_class=DocumentSummary
+        )
+        
+        # Log the operation in background
+        background_tasks.add_task(log_operation, "summarize", len(text))
+        
+        return {"summary": result.dict()}
+    except RevosTokenError:
+        raise HTTPException(status_code=401, detail="Authentication failed")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Processing failed: {e}")
+
+@app.post("/analyze-sentiment")
+async def analyze_sentiment(text: str):
+    """Analyze sentiment of text using Revos."""
+    try:
+        result = extractor.extract_structured_data(
+            prompt=f"Analyze the sentiment of this text: {text}",
+            target_class=SentimentAnalysis
+        )
+        return {"analysis": result.dict()}
+    except RevosTokenError:
+        raise HTTPException(status_code=401, detail="Authentication failed")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Analysis failed: {e}")
+
+@app.get("/health")
+async def health_check():
+    """Comprehensive health check."""
+    try:
+        token = get_revos_token()
+        return {
+            "status": "healthy",
+            "revos_connected": True,
+            "token_available": bool(token),
+            "background_service_running": token_manager.is_background_service_running() if token_manager else False
+        }
+    except Exception:
+        return {
+            "status": "degraded",
+            "revos_connected": False,
+            "token_available": False
+        }
+
+async def log_operation(operation: str, data_size: int):
+    """Background task to log operations."""
+    print(f"Operation '{operation}' completed on {data_size} characters")
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+```
+
+### Environment Configuration for FastAPI
+
+Create a `.env` file for your FastAPI app:
+
+```bash
+# .env
+REVOS_CLIENT_ID=your_client_id
+REVOS_CLIENT_SECRET=your_client_secret
+REVOS_TOKEN_URL=https://your-site.com/revo/oauth/token
+REVOS_BASE_URL=https://your-site.com/revo/llm-api
+
+# LLM Configuration
+LLM_MODEL=gpt-4
+LLM_TEMPERATURE=0.1
+LLM_MAX_TOKENS=1000
+
+# Token Management
+TOKEN_MANAGER_REFRESH_INTERVAL_MINUTES=30
+TOKEN_MANAGER_MAX_FAILURES_BEFORE_FALLBACK=3
+```
+
+### Running the FastAPI Application
+
+```bash
+# Install dependencies
+pip install fastapi uvicorn revos
+
+# Run the application
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+# Or with the Makefile
+make run-fastapi
+```
+
+### Key Benefits of FastAPI Integration
+
+1. **🔄 Automatic Token Management**: Background refresh keeps tokens valid
+2. **🛡️ Error Handling**: Proper HTTP status codes for different error types
+3. **💉 Dependency Injection**: Clean separation of concerns
+4. **📊 Health Monitoring**: Endpoints to check system status
+5. **⚡ Background Tasks**: Non-blocking operations
+6. **⚙️ Configuration Management**: Environment-based configuration
+7. **🔒 Thread Safety**: Safe for concurrent requests
+8. **📚 Modern FastAPI**: Uses `lifespan` instead of deprecated `on_event`
+
 ## API Reference
 
 ### Configuration Classes
 
-#### RevoMainConfig
+#### RevosMainConfig
 
-Main configuration class for the Revo library.
+Main configuration class for the Revos library.
 
 **Methods:**
 - `from_file(config_path)`: Load configuration from a file (YAML, JSON, or .env)
@@ -774,21 +1175,21 @@ Main configuration class for the Revo library.
 - `create_config_with_prefixes()`: Create configuration with custom environment variable prefixes
 
 **Properties:**
-- `revo`: RevoConfig instance
+- `revo`: RevosConfig instance
 - `llm`: LLMConfig instance
 - `logging`: LoggingConfig instance
 - `token_manager`: TokenManagerConfig instance
 - `debug`: Global debug flag
 
-#### RevoConfig
+#### RevosConfig
 
-Revo API configuration settings.
+Revos API configuration settings.
 
 **Properties:**
-- `client_id`: Revo API client identifier (required)
-- `client_secret`: Revo API client secret (required)
+- `client_id`: Revos API client identifier (required)
+- `client_secret`: Revos API client secret (required)
 - `token_url`: OAuth token endpoint URL
-- `base_url`: Revo API base URL
+- `base_url`: Revos API base URL
 - `token_buffer_minutes`: Buffer time before token expiration
 - `max_retries`: Maximum retry attempts for requests
 - `request_timeout`: Request timeout in seconds
@@ -826,9 +1227,9 @@ Token manager configuration settings.
 - `enable_periodic_refresh`: Enable automatic periodic token refresh
 - `enable_fallback`: Enable fallback authentication method
 
-### RevoTokenManager
+### RevosTokenManager
 
-Manages Revo API authentication tokens with dual authentication methods.
+Manages Revos API authentication tokens with dual authentication methods.
 
 #### Methods
 
@@ -860,16 +1261,16 @@ Manages authentication tokens for LLM services with automatic refresh.
 - `refresh_extractor()`: Refresh the LLM extractor with new token
 - `periodic_refresh()`: Background task for periodic token refresh
 
-### RevoConfig
+### RevosConfig
 
-Configuration class for Revo API settings.
+Configuration class for Revos API settings.
 
 #### Properties
 
-- `client_id`: Revo API client identifier
-- `client_secret`: Revo API client secret
+- `client_id`: Revos API client identifier
+- `client_secret`: Revos API client secret
 - `token_url`: OAuth token endpoint URL
-- `base_url`: Revo API base URL
+- `base_url`: Revos API base URL
 - `token_buffer_minutes`: Buffer time before token expiration
 - `llm_model`: LLM model name
 - `llm_temperature`: LLM temperature setting

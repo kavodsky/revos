@@ -1,7 +1,7 @@
 # Revo Library Configuration Example
 # Copy this file to config.yaml and modify the values as needed
 
-revo:
+revos:
   # Required: Your Revo API credentials
   client_id: "your_revo_client_id_here"
   client_secret: "your_revo_client_secret_here"

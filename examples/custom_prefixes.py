@@ -1,22 +1,33 @@
 #!/usr/bin/env python3
 """
-Example: Using custom environment variable prefixes with the Revo library.
+Example: Using custom environment variable prefixes with the Revos library.
 
-This example demonstrates how to configure the Revo library to use
+This example demonstrates how to configure the Revos library to use
 custom environment variable prefixes instead of the default ones.
 """
 
 import os
-from revo import create_config_with_prefixes, RevoTokenManager
+from revos import create_config_with_prefixes, RevosTokenManager
 
 
 def example_custom_prefixes():
     """Example: Using custom environment variable prefixes."""
     print("Custom Environment Variable Prefixes Example")
     print("=" * 50)
+    print("This example shows how to use custom prefixes like RUMBA_ instead of REVOS_")
+    print()
     
     # Set custom environment variables with different prefixes
     os.environ.update({
+        # RUMBA_ prefix example (as requested by user)
+        "RUMBA_CLIENT_ID": "your_rumba_client_id",
+        "RUMBA_CLIENT_SECRET": "your_rumba_client_secret",
+        "RUMBA_TOKEN_URL": "https://your-site.com/revo/oauth/token",
+        "RUMBA_BASE_URL": "https://your-site.com/revo/llm-api",
+        "RUMBA_LLM_MODEL": "gpt-4",
+        "RUMBA_LLM_TEMPERATURE": "0.1",
+        "RUMBA_LLM_MAX_TOKENS": "1000",
+        
         # Custom API prefix
         "MY_API_CLIENT_ID": "your-custom-client-id",
         "MY_API_CLIENT_SECRET": "your-custom-client-secret",
@@ -37,23 +48,43 @@ def example_custom_prefixes():
         "AUTH_ENABLE_FALLBACK": "true",
     })
     
-    # Create configuration with custom prefixes
+    # Example 1: RUMBA_ prefix configuration (as requested by user)
+    print("🎵 Example 1: RUMBA_ Prefix Configuration")
+    print("-" * 40)
+    
+    rumba_config = create_config_with_prefixes(
+        revo_prefix="RUMBA_",  # Use RUMBA_ prefix instead of REVOS_
+        llm_prefix="RUMBA_LLM_",  # Use RUMBA_LLM_ prefix for LLM settings
+        logging_prefix="RUMBA_LOG_",  # Use RUMBA_LOG_ prefix for logging
+        token_prefix="RUMBA_TOKEN_"  # Use RUMBA_TOKEN_ prefix for token management
+    )
+    
+    print("✓ RUMBA_ prefix configuration created")
+    print(f"  🎵 RUMBA Client ID: {rumba_config.revo.client_id}")
+    print(f"  🎵 RUMBA Base URL: {rumba_config.revo.base_url}")
+    print(f"  🤖 RUMBA LLM Model: {rumba_config.llm.model}")
+    print(f"  🌡️  RUMBA Temperature: {rumba_config.llm.temperature}")
+    print()
+    
+    # Example 2: Multiple custom prefixes
+    print("🔧 Example 2: Multiple Custom Prefixes")
+    print("-" * 40)
+    
     config = create_config_with_prefixes(
-        revo_prefix="MY_API_",      # Instead of "REVO_"
-        llm_prefix="AI_",           # Instead of "LLM_"
-        logging_prefix="APP_",      # Instead of "LOG_"
-        token_prefix="AUTH_",       # Instead of "TOKEN_"
-        debug=True
+        revo_prefix="MY_API_",  # Use MY_API_ prefix instead of REVOS_
+        llm_prefix="AI_",  # Use AI_ prefix for LLM settings
+        logging_prefix="APP_",  # Use APP_ prefix for logging
+        token_prefix="AUTH_"  # Use AUTH_ prefix for token management
     )
     
     print("✓ Configuration created with custom prefixes")
-    print(f"  API Client ID: {config.revo.client_id}")
-    print(f"  API Base URL: {config.revo.base_url}")
-    print(f"  LLM Model: {config.llm.model}")
-    print(f"  LLM Temperature: {config.llm.temperature}")
-    print(f"  Log Level: {config.logging.level}")
-    print(f"  Token Refresh Interval: {config.token_manager.refresh_interval_minutes}")
-    print(f"  Enable Fallback: {config.token_manager.enable_fallback}")
+    print(f"  🔧 API Client ID: {config.revo.client_id}")
+    print(f"  🔧 API Base URL: {config.revo.base_url}")
+    print(f"  🤖 LLM Model: {config.llm.model}")
+    print(f"  🌡️  LLM Temperature: {config.llm.temperature}")
+    print(f"  📝 Log Level: {config.logging.level}")
+    print(f"  🔄 Token Refresh Interval: {config.token_manager.refresh_interval_minutes}")
+    print(f"  🛡️  Enable Fallback: {config.token_manager.enable_fallback}")
     
     return config
 
@@ -65,7 +96,7 @@ def example_mixed_prefixes():
     
     # Set environment variables with mixed prefixes
     os.environ.update({
-        # Keep default Revo prefix
+        # Keep default Revos prefix
         "REVO_CLIENT_ID": "default-revo-client-id",
         "REVO_CLIENT_SECRET": "default-revo-client-secret",
         
@@ -87,7 +118,7 @@ def example_mixed_prefixes():
     )
     
     print("✓ Configuration created with mixed prefixes")
-    print(f"  Revo Client ID: {config.revo.client_id}")
+    print(f"  Revos Client ID: {config.revo.client_id}")
     print(f"  LLM Model: {config.llm.model}")
     print(f"  LLM Temperature: {config.llm.temperature}")
     print(f"  Log Level: {config.logging.level}")
@@ -155,8 +186,8 @@ def example_enterprise_prefixes():
     )
     
     print("✓ Configuration created with enterprise-style prefixes")
-    print(f"  Company Revo Client ID: {config.revo.client_id}")
-    print(f"  Company Revo Base URL: {config.revo.base_url}")
+    print(f"  Company Revos Client ID: {config.revo.client_id}")
+    print(f"  Company Revos Base URL: {config.revo.base_url}")
     print(f"  Company LLM Model: {config.llm.model}")
     print(f"  Company LLM Temperature: {config.llm.temperature}")
     print(f"  Company Log Level: {config.logging.level}")
@@ -167,12 +198,14 @@ def example_enterprise_prefixes():
 
 def main():
     """Run all custom prefix examples."""
-    print("Revo Library - Custom Environment Variable Prefixes")
+    print("Revos Library - Custom Environment Variable Prefixes")
     print("=" * 55)
+    print("🎵 Including RUMBA_ prefix example as requested!")
+    print()
     
     try:
         # Run examples
-        example_custom_prefixes()
+        example_custom_prefixes()  # Now includes RUMBA_ prefix example
         example_mixed_prefixes()
         example_minimal_prefixes()
         example_enterprise_prefixes()
@@ -181,9 +214,10 @@ def main():
         print("✓ All custom prefix examples completed successfully!")
         print("\nKey Benefits:")
         print("• Avoid conflicts with existing environment variables")
-        print("• Use your organization's naming conventions")
-        print("• Support multiple Revo instances in the same environment")
+        print("• Use your organization's naming conventions (like RUMBA_)")
+        print("• Support multiple Revos instances in the same environment")
         print("• Maintain backward compatibility with default prefixes")
+        print("• Easy integration with Docker, Kubernetes, and cloud platforms")
         
     except Exception as e:
         print(f"\n❌ Error: {e}")

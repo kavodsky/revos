@@ -1,7 +1,7 @@
 """
-Revo API configuration settings.
+Revos API configuration settings.
 
-This module contains configuration classes for the Revo API authentication
+This module contains configuration classes for the Revos API authentication
 and connection settings.
 """
 
@@ -10,31 +10,31 @@ from pydantic import Field, validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class RevoConfig(BaseSettings):
-    """Revo API configuration settings."""
+class RevosConfig(BaseSettings):
+    """Revos API configuration settings."""
     
     model_config = SettingsConfigDict(
-        env_prefix="REVO_",
+        env_prefix="REVOS_",
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore"
     )
     
-    # Required Revo credentials
+    # Required Revos credentials
     client_id: str = Field(
         ...,
-        description="Revo API client ID",
+        description="Revos API client ID",
         min_length=1
     )
     
     client_secret: str = Field(
         ...,
-        description="Revo API client secret",
+        description="Revos API client secret",
         min_length=1
     )
     
-    # Revo API endpoints
+    # Revos API endpoints
     token_url: str = Field(
         default="https://your-site.com/revo/oauth/token",
         description="OAuth token endpoint URL"
@@ -42,7 +42,7 @@ class RevoConfig(BaseSettings):
     
     base_url: str = Field(
         default="https://your-site.com/revo/llm-api",
-        description="Revo API base URL"
+        description="Revos API base URL"
     )
     
     # Token management settings

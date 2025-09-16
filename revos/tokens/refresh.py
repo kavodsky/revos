@@ -1,7 +1,7 @@
 """
 Token Refresh Logic
 
-This module provides token refresh functionality for the Revo library,
+This module provides token refresh functionality for the Revos library,
 including validation, testing, and refresh operations.
 """
 
@@ -10,7 +10,7 @@ import traceback
 from datetime import datetime, timedelta
 from typing import Optional
 
-from ..auth.exceptions import RevoTokenError
+from ..auth.exceptions import RevosTokenError
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +73,7 @@ class TokenRefreshManager:
             bool: True if refresh was successful, False otherwise
 
         Raises:
-            RevoTokenError: If refresh fails after all attempts
+            RevosTokenError: If refresh fails after all attempts
 
         Refresh Process:
             1. Invalidate current tokens to force refresh
@@ -85,8 +85,8 @@ class TokenRefreshManager:
             logger.info("Starting token refresh process...")
             
             # Invalidate current tokens to force refresh
-            from ..auth.tokens import invalidate_revo_token
-            invalidate_revo_token()
+            from ..auth.tokens import invalidate_revos_token
+            invalidate_revos_token()
             
             # Test token acquisition without LLM calls
             if self._test_token_acquisition():
@@ -101,7 +101,7 @@ class TokenRefreshManager:
         except Exception as e:
             logger.error(f"Token refresh failed with exception: {e}")
             logger.error(f"Token refresh traceback: {traceback.format_exc()}")
-            raise RevoTokenError(f"Token refresh failed: {e}")
+            raise RevosTokenError(f"Token refresh failed: {e}")
 
     def _test_token_acquisition(self) -> bool:
         """
@@ -123,8 +123,8 @@ class TokenRefreshManager:
             logger.debug("Testing token acquisition...")
             
             # Try to get a fresh token
-            from ..auth.tokens import get_revo_token
-            token = get_revo_token(force_refresh=True)
+            from ..auth.tokens import get_revos_token
+            token = get_revos_token(force_refresh=True)
             
             # Validate token
             if token and isinstance(token, str) and len(token) > 0:
@@ -138,4 +138,13 @@ class TokenRefreshManager:
             logger.warning(f"Token acquisition test failed with exception: {e}")
             logger.debug(f"Token acquisition test traceback: {traceback.format_exc()}")
             return False
+    
+    def get_last_refresh_time(self) -> Optional[datetime]:
+        """
+        Get the timestamp of the last successful token refresh.
+        
+        Returns:
+            Optional[datetime]: Last refresh timestamp, or None if no refresh has occurred
+        """
+        return self.last_refresh
 

@@ -1,7 +1,7 @@
 """
-Revo API Authentication Core
+Revos API Authentication Core
 
-This module provides the core authentication logic for the Revo API,
+This module provides the core authentication logic for the Revos API,
 including token acquisition, validation, and management.
 """
 
@@ -13,16 +13,16 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from ..config import get_settings
-from .exceptions import RevoAuthenticationError, RevoAPIError
+from .exceptions import RevosAuthenticationError, RevosAPIError
 
 logger = logging.getLogger(__name__)
 
 
-class RevoTokenManager:
+class RevosTokenManager:
     """
-    Manages Revo API authentication tokens with dual authentication methods.
+    Manages Revos API authentication tokens with dual authentication methods.
 
-    This class provides robust token management for the Revo API service,
+    This class provides robust token management for the Revos API service,
     implementing both primary and fallback authentication methods to ensure
     continuous service availability. It handles token lifecycle, automatic
     refresh, and intelligent fallback switching based on failure patterns.
@@ -32,8 +32,8 @@ class RevoTokenManager:
     2. Fallback httpx-based method for OpenShift compatibility
 
     Attributes:
-        client_id: Revo API client identifier
-        client_secret: Revo API client secret key
+        client_id: Revos API client identifier
+        client_secret: Revos API client secret key
         token_url: OAuth token endpoint URL
         _token: Current access token (private)
         _token_expires_at: Token expiration timestamp (private)
@@ -50,9 +50,9 @@ class RevoTokenManager:
     
     def __init__(self, settings_instance: Optional[object] = None):
         """
-        Initialize the Revo token manager with configuration.
+        Initialize the Revos token manager with configuration.
 
-        Reads Revo API configuration from the provided settings or global settings
+        Reads Revos API configuration from the provided settings or global settings
         and validates that all required configuration values are present. 
         Sets up the authentication parameters and initializes internal state.
 
@@ -60,29 +60,29 @@ class RevoTokenManager:
             settings_instance: Optional settings instance. If None, uses global settings.
 
         Raises:
-            ValueError: If required Revo configuration is missing
+            ValueError: If required Revos configuration is missing
         """
         self.settings = settings_instance or get_settings()
-        self.revo_config = self.settings.revo
+        self.revos_config = self.settings.revos
         
-        self.client_id = self.revo_config.client_id
-        self.client_secret = self.revo_config.client_secret
-        self.token_url = self.revo_config.token_url
-        self.base_url = self.revo_config.base_url
+        self.client_id = self.revos_config.client_id
+        self.client_secret = self.revos_config.client_secret
+        self.token_url = self.revos_config.token_url
+        self.base_url = self.revos_config.base_url
         self._token = None
         self._token_expires_at = None
-        self._buffer_minutes = self.revo_config.token_buffer_minutes
-        self.max_retries = self.revo_config.max_retries
-        self.request_timeout = self.revo_config.request_timeout
+        self._buffer_minutes = self.revos_config.token_buffer_minutes
+        self.max_retries = self.revos_config.max_retries
+        self.request_timeout = self.revos_config.request_timeout
         self.consecutive_failures = 0
         self.max_failures_before_fallback = self.settings.token_manager.max_failures_before_fallback
 
         if not all([self.client_id, self.client_secret, self.token_url]):
-            raise ValueError("Missing required Revo configuration. Please set REVO_CLIENT_ID and REVO_CLIENT_SECRET environment variables.")
+            raise ValueError("Missing required Revos configuration. Please set REVOS_CLIENT_ID and REVOS_CLIENT_SECRET environment variables.")
 
     def _fetch_new_token(self) -> dict:
         """
-        Fetch a new token from Revo using the original OAuth2 method.
+        Fetch a new token from Revos using the original OAuth2 method.
 
         This method implements the standard OAuth2 client credentials flow
         using the requests library. It includes retry logic with exponential
@@ -141,11 +141,11 @@ class RevoTokenManager:
                     time.sleep(delay)
                 else:
                     logger.error("All original token fetch attempts failed")
-                    raise RevoAPIError(f"Failed to fetch token after {max_retries} attempts: {e}")
+                    raise RevosAPIError(f"Failed to fetch token after {max_retries} attempts: {e}")
 
             except ValueError as e:
                 logger.error(f"Invalid token response: {e}")
-                raise RevoAuthenticationError(f"Invalid token response: {e}")
+                raise RevosAuthenticationError(f"Invalid token response: {e}")
 
     def _fetch_new_token_fallback(self) -> dict:
         """
@@ -186,7 +186,7 @@ class RevoTokenManager:
 
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
-            "User-Agent": "Revo-Python-Client/1.0",
+            "User-Agent": "Revos-Python-Client/1.0",
         }
 
         max_retries = self.max_retries
@@ -220,11 +220,11 @@ class RevoTokenManager:
                     time.sleep(delay)
                 else:
                     logger.error("All fallback token fetch attempts failed")
-                    raise RevoAPIError(f"Failed to fetch token using fallback method after {max_retries} attempts: {e}")
+                    raise RevosAPIError(f"Failed to fetch token using fallback method after {max_retries} attempts: {e}")
 
             except ValueError as e:
                 logger.error(f"Invalid fallback token response: {e}")
-                raise RevoAuthenticationError(f"Invalid fallback token response: {e}")
+                raise RevosAuthenticationError(f"Invalid fallback token response: {e}")
 
     def get_token(self, force_refresh: bool = False, use_fallback: bool = False) -> str:
         """
@@ -248,8 +248,8 @@ class RevoTokenManager:
             str: Valid access token for API operations
 
         Raises:
-            RevoAuthenticationError: If authentication fails with both methods
-            RevoAPIError: If API requests fail after all retries
+            RevosAuthenticationError: If authentication fails with both methods
+            RevosAPIError: If API requests fail after all retries
 
         Token Management Logic:
             1. If force_refresh is True, immediately fetch new token
@@ -286,7 +286,7 @@ class RevoTokenManager:
             use_fallback: If True, uses fallback method; if False, uses intelligent switching
 
         Raises:
-            RevoAuthenticationError: If both authentication methods fail
+            RevosAuthenticationError: If both authentication methods fail
         """
         # Determine which method to use
         should_use_fallback = (
@@ -332,7 +332,7 @@ class RevoTokenManager:
                     logger.error(f"Fallback method also failed: {fallback_error}")
                     logger.error(f"Fallback method traceback: {traceback.format_exc()}")
             
-            raise RevoAuthenticationError(f"Failed to obtain token: {e}")
+            raise RevosAuthenticationError(f"Failed to obtain token: {e}")
 
     def invalidate_token(self) -> None:
         """
@@ -346,7 +346,7 @@ class RevoTokenManager:
         The method also resets the consecutive failure counter, giving
         the system a fresh start for authentication attempts.
         """
-        logger.info("Invalidating current Revo token")
+        logger.info("Invalidating current Revos token")
         self._token = None
         self._token_expires_at = None
         self.consecutive_failures = 0

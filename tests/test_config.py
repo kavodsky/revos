@@ -9,13 +9,13 @@ import yaml
 import json
 from unittest.mock import patch, Mock
 
-from revo.config.main import RevoMainConfig, get_settings, load_config_from_file
-from revo.config.api import RevoConfig
-from revo.config.llm import LLMConfig
-from revo.config.llm_models import LLMModelConfig, LLMModelsConfig
-from revo.config.logging import LoggingConfig
-from revo.config.token import TokenManagerConfig
-from revo.config.factory import (
+from revos.config.main import RevosMainConfig, get_settings, load_config_from_file
+from revos.config.api import RevosConfig
+from revos.config.llm import LLMConfig
+from revos.config.llm_models import LLMModelConfig, LLMModelsConfig
+from revos.config.logging import LoggingConfig
+from revos.config.token import TokenManagerConfig
+from revos.config.factory import (
     create_config_with_prefixes,
     create_minimal_config,
     create_development_config,
@@ -23,12 +23,12 @@ from revo.config.factory import (
 )
 
 
-class TestRevoConfig:
-    """Test cases for RevoConfig."""
+class TestRevosConfig:
+    """Test cases for RevosConfig."""
     
     def test_init_with_required_fields(self):
-        """Test RevoConfig initialization with required fields."""
-        config = RevoConfig(
+        """Test RevosConfig initialization with required fields."""
+        config = RevosConfig(
             client_id="test-client-id",
             client_secret="test-client-secret"
         )
@@ -39,8 +39,8 @@ class TestRevoConfig:
         assert config.base_url == "https://your-site.com/revo/llm-api"
     
     def test_init_with_custom_urls(self):
-        """Test RevoConfig initialization with custom URLs."""
-        config = RevoConfig(
+        """Test RevosConfig initialization with custom URLs."""
+        config = RevosConfig(
             client_id="test-client-id",
             client_secret="test-client-secret",
             token_url="https://custom.com/oauth/token",
@@ -236,16 +236,16 @@ class TestTokenManagerConfig:
         assert config.enable_fallback is False
 
 
-class TestRevoMainConfig:
-    """Test cases for RevoMainConfig."""
+class TestRevosMainConfig:
+    """Test cases for RevosMainConfig."""
     
     def test_init_with_defaults(self):
-        """Test RevoMainConfig initialization with defaults."""
+        """Test RevosMainConfig initialization with defaults."""
         with patch.dict(os.environ, {
-            'REVO_CLIENT_ID': 'test-client-id',
-            'REVO_CLIENT_SECRET': 'test-client-secret'
+            'REVOS_CLIENT_ID': 'test-client-id',
+            'REVOS_CLIENT_SECRET': 'test-client-secret'
         }):
-            config = RevoMainConfig()
+            config = RevosMainConfig()
             
             assert config.revo.client_id == "test-client-id"
             assert config.revo.client_secret == "test-client-secret"
@@ -255,8 +255,8 @@ class TestRevoMainConfig:
             assert isinstance(config.token_manager, TokenManagerConfig)
     
     def test_init_with_custom_values(self):
-        """Test RevoMainConfig initialization with custom values."""
-        config = RevoMainConfig(
+        """Test RevosMainConfig initialization with custom values."""
+        config = RevosMainConfig(
             revo={
                 "client_id": "custom-client-id",
                 "client_secret": "custom-client-secret"
@@ -279,7 +279,7 @@ class TestConfigFactory:
     def test_create_config_with_prefixes(self):
         """Test create_config_with_prefixes function."""
         config = create_config_with_prefixes(
-            revo_prefix="CUSTOM_REVO_",
+            revo_prefix="CUSTOM_REVOS_",
             llm_prefix="CUSTOM_LLM_",
             revo={
                 "client_id": "test-client-id",
@@ -287,7 +287,7 @@ class TestConfigFactory:
             }
         )
         
-        assert isinstance(config, RevoMainConfig)
+        assert isinstance(config, RevosMainConfig)
         # The function should work without errors
     
     def test_create_minimal_config(self):
@@ -297,7 +297,7 @@ class TestConfigFactory:
             client_secret="minimal-client-secret"
         )
         
-        assert isinstance(config, RevoMainConfig)
+        assert isinstance(config, RevosMainConfig)
         assert config.revo.client_id == "minimal-client-id"
         assert config.revo.client_secret == "minimal-client-secret"
     
@@ -308,7 +308,7 @@ class TestConfigFactory:
             client_secret="dev-client-secret"
         )
         
-        assert isinstance(config, RevoMainConfig)
+        assert isinstance(config, RevosMainConfig)
         assert config.revo.client_id == "dev-client-id"
         assert config.revo.client_secret == "dev-client-secret"
         assert config.logging.level == "DEBUG"
@@ -320,7 +320,7 @@ class TestConfigFactory:
             client_secret="prod-client-secret"
         )
         
-        assert isinstance(config, RevoMainConfig)
+        assert isinstance(config, RevosMainConfig)
         assert config.revo.client_id == "prod-client-id"
         assert config.revo.client_secret == "prod-client-secret"
         assert config.logging.level == "WARNING"
@@ -347,7 +347,7 @@ class TestConfigFileLoading:
             temp_file = f.name
         
         try:
-            config = RevoMainConfig.from_file(temp_file)
+            config = RevosMainConfig.from_file(temp_file)
             
             assert config.revo.client_id == "yaml-client-id"
             assert config.revo.client_secret == "yaml-client-secret"
@@ -374,7 +374,7 @@ class TestConfigFileLoading:
             temp_file = f.name
         
         try:
-            config = RevoMainConfig.from_file(temp_file)
+            config = RevosMainConfig.from_file(temp_file)
             
             assert config.revo.client_id == "json-client-id"
             assert config.revo.client_secret == "json-client-secret"
@@ -399,7 +399,7 @@ class TestConfigFileLoading:
         try:
             config = load_config_from_file(temp_file)
             
-            assert isinstance(config, RevoMainConfig)
+            assert isinstance(config, RevosMainConfig)
             assert config.revo.client_id == "function-client-id"
             assert config.revo.client_secret == "function-client-secret"
         finally:
@@ -412,25 +412,25 @@ class TestSettings:
     def test_get_settings(self):
         """Test get_settings function."""
         # Clear the global settings cache
-        from revo.config.main import _settings
-        import revo.config.main
-        revo.config.main._settings = None
+        from revos.config.main import _settings
+        import revos.config.main
+        revos.config.main._settings = None
         
         with patch.dict(os.environ, {
-            'REVO_CLIENT_ID': 'settings-client-id',
-            'REVO_CLIENT_SECRET': 'settings-client-secret'
+            'REVOS_CLIENT_ID': 'settings-client-id',
+            'REVOS_CLIENT_SECRET': 'settings-client-secret'
         }):
             settings = get_settings()
             
-            assert isinstance(settings, RevoMainConfig)
+            assert isinstance(settings, RevosMainConfig)
             assert settings.revo.client_id == "settings-client-id"
             assert settings.revo.client_secret == "settings-client-secret"
     
     def test_get_settings_singleton(self):
         """Test that get_settings returns the same instance."""
         with patch.dict(os.environ, {
-            'REVO_CLIENT_ID': 'singleton-client-id',
-            'REVO_CLIENT_SECRET': 'singleton-client-secret'
+            'REVOS_CLIENT_ID': 'singleton-client-id',
+            'REVOS_CLIENT_SECRET': 'singleton-client-secret'
         }):
             settings1 = get_settings()
             settings2 = get_settings()

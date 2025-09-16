@@ -1,3 +1,3 @@
 """
-Test package for the Revo library.
+Test package for the Revos library.
 """

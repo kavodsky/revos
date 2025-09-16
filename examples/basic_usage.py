@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Basic usage example for the Revo library.
+Basic usage example for the Revos library.
 
 This example demonstrates:
 1. Setting up environment variables
@@ -15,16 +15,16 @@ from pydantic import BaseModel
 from langchain_core.prompts import PromptTemplate
 
 # Import the revo library
-from revo import (
-    RevoMainConfig,
-    RevoConfig,
+from revos import (
+    RevosMainConfig,
+    RevosConfig,
     LLMConfig,
     LoggingConfig,
     TokenManagerConfig,
     get_settings,
     load_config_from_file,
-    RevoTokenManager,
-    get_revo_token,
+    RevosTokenManager,
+        get_revos_token,
     LangChainExtractor,
     TokenManager
 )
@@ -40,7 +40,7 @@ class PersonInfo(BaseModel):
 
 async def main():
     """Main example function."""
-    print("Revo Library Basic Usage Example")
+    print("Revos Library Basic Usage Example")
     print("=" * 40)
     
     # Check if environment variables are set
@@ -64,7 +64,7 @@ async def main():
         print(f"✓ Successfully obtained token: {token[:20]}...")
         
         # Create a custom token manager
-        token_manager = RevoTokenManager()
+        token_manager = RevosTokenManager()
         token2 = token_manager.get_token()
         print(f"✓ Custom token manager token: {token2[:20]}...")
         
@@ -77,8 +77,8 @@ async def main():
     
     # Get current settings
     settings = get_settings()
-    print(f"✓ Revo Token URL: {settings.revo.token_url}")
-    print(f"✓ Revo Base URL: {settings.revo.base_url}")
+    print(f"✓ Revos Token URL: {settings.revo.token_url}")
+    print(f"✓ Revos Base URL: {settings.revo.base_url}")
     print(f"✓ LLM Model: {settings.llm.model}")
     print(f"✓ LLM Temperature: {settings.llm.temperature}")
     print(f"✓ Token Buffer Minutes: {settings.revo.token_buffer_minutes}")
@@ -90,8 +90,8 @@ async def main():
     print("-" * 22)
     
     # Create a custom configuration
-    custom_config = RevoMainConfig(
-        revo=RevoConfig(
+    custom_config = RevosMainConfig(
+        revo=RevosConfig(
             client_id="custom_client_id",
             client_secret="custom_client_secret",
             token_url="https://custom.example.com/token"
@@ -103,14 +103,14 @@ async def main():
         debug=True
     )
     
-    print(f"✓ Custom Revo URL: {custom_config.revo.token_url}")
+    print(f"✓ Custom Revos URL: {custom_config.revo.token_url}")
     print(f"✓ Custom LLM Model: {custom_config.llm.model}")
     print(f"✓ Debug Mode: {custom_config.debug}")
     
     # Show configuration summary
     print("\n4. Configuration Summary")
     print("-" * 25)
-    print(f"  Revo API URL: {custom_config.revo.base_url}")
+    print(f"  Revos API URL: {custom_config.revo.base_url}")
     print(f"  LLM Model: {custom_config.llm.model}")
     print(f"  Log Level: {custom_config.logging.level}")
     print(f"  Debug Mode: {custom_config.debug}")
@@ -150,7 +150,7 @@ async def main():
         
     except Exception as e:
         print(f"✗ Extraction failed: {e}")
-        print("  This is expected if Revo credentials are not configured.")
+        print("  This is expected if Revos credentials are not configured.")
     
     # 6. Token Manager with periodic refresh
     print("\n6. Token Manager")

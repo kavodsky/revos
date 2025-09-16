@@ -8,16 +8,16 @@ token operations that can be used throughout the application.
 import logging
 from typing import Optional
 
-from .core import RevoTokenManager
-from .exceptions import RevoAuthenticationError
+from .core import RevosTokenManager
+from .exceptions import RevosAuthenticationError
 
 logger = logging.getLogger(__name__)
 
 # Global token manager instance
-_token_manager: Optional[RevoTokenManager] = None
+_token_manager: Optional[RevosTokenManager] = None
 
 
-def _get_token_manager() -> RevoTokenManager:
+def _get_token_manager() -> RevosTokenManager:
     """
     Get or create the global token manager instance.
     
@@ -26,27 +26,27 @@ def _get_token_manager() -> RevoTokenManager:
     is properly loaded before initialization.
     
     Returns:
-        RevoTokenManager: Global token manager instance
+        RevosTokenManager: Global token manager instance
         
     Raises:
-        RevoAuthenticationError: If token manager initialization fails
+        RevosAuthenticationError: If token manager initialization fails
     """
     global _token_manager
     if _token_manager is None:
         try:
-            _token_manager = RevoTokenManager()
+            _token_manager = RevosTokenManager()
         except Exception as e:
             logger.error(f"Failed to initialize token manager: {e}")
-            raise RevoAuthenticationError(f"Token manager initialization failed: {e}")
+            raise RevosAuthenticationError(f"Token manager initialization failed: {e}")
     return _token_manager
 
 
-def get_revo_token(force_refresh: bool = False, use_fallback: bool = False) -> str:
+def get_revos_token(force_refresh: bool = False, use_fallback: bool = False) -> str:
     """
-    Get Revo access token with automatic refresh and fallback support.
+    Get Revos access token with automatic refresh and fallback support.
 
-    This is the main public interface for obtaining Revo API access tokens.
-    It delegates to the global RevoTokenManager instance and provides
+    This is the main public interface for obtaining Revos API access tokens.
+    It delegates to the global RevosTokenManager instance and provides
     a simple interface for token operations.
 
     The function handles all token lifecycle management automatically,
@@ -58,36 +58,36 @@ def get_revo_token(force_refresh: bool = False, use_fallback: bool = False) -> s
         use_fallback: If True, uses fallback authentication method instead of original
 
     Returns:
-        str: Valid access token for Revo API operations
+        str: Valid access token for Revos API operations
 
     Raises:
-        RevoAuthenticationError: If authentication fails with both methods
-        RevoAPIError: If API requests fail after all retries
+        RevosAuthenticationError: If authentication fails with both methods
+        RevosAPIError: If API requests fail after all retries
 
     Examples:
         # Get current token (refresh if needed)
-        token = get_revo_token()
+        token = get_revos_token()
         
         # Force refresh token
-        token = get_revo_token(force_refresh=True)
+        token = get_revos_token(force_refresh=True)
         
         # Use fallback authentication method
-        token = get_revo_token(use_fallback=True)
+        token = get_revos_token(use_fallback=True)
     """
     try:
         token_manager = _get_token_manager()
         return token_manager.get_token(force_refresh=force_refresh, use_fallback=use_fallback)
     except Exception as e:
-        logger.error(f"Failed to get Revo token: {e}")
+        logger.error(f"Failed to get Revos token: {e}")
         raise
 
 
-def invalidate_revo_token():
+def invalidate_revos_token():
     """
-    Invalidate current Revo token to force refresh.
+    Invalidate current Revos token to force refresh.
 
     This function clears the current token in the global token manager,
-    forcing the system to fetch a new token on the next get_revo_token()
+    forcing the system to fetch a new token on the next get_revos_token()
     call. It's useful for handling token revocation or when you need to
     ensure a fresh token is obtained.
 
@@ -96,17 +96,17 @@ def invalidate_revo_token():
 
     Examples:
         # Invalidate current token
-        invalidate_revo_token()
+        invalidate_revos_token()
         
         # Next call will fetch a new token
-        token = get_revo_token()
+        token = get_revos_token()
     """
     try:
         token_manager = _get_token_manager()
         token_manager.invalidate_token()
-        logger.info("Revo token invalidated successfully")
+        logger.info("Revos token invalidated successfully")
     except Exception as e:
-        logger.error(f"Failed to invalidate Revo token: {e}")
+        logger.error(f"Failed to invalidate Revos token: {e}")
         raise
 
 
@@ -149,7 +149,7 @@ def reset_token_manager():
         reset_token_manager()
         
         # Next token operation will create a new manager
-        token = get_revo_token()
+        token = get_revos_token()
     """
     global _token_manager
     _token_manager = None

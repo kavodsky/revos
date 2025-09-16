@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-Example: Using Multiple LLM Models with the Revo Library
+Example: Using Multiple LLM Models with the Revos Library
 
 This example demonstrates how to configure and use multiple LLM models
 with different settings for different use cases.
 """
 
 import os
-from revo import (
-    RevoMainConfig, 
+from revos import (
+    RevosMainConfig, 
     LangChainExtractor, 
     get_langchain_extractor,
     create_all_extractors,
@@ -186,7 +186,7 @@ def example_configuration():
         # Load configuration from file (if it exists)
         config_file = "config_multiple_models.yaml.example"
         if os.path.exists(config_file):
-            config = RevoMainConfig.from_file(config_file)
+            config = RevosMainConfig.from_file(config_file)
             print(f"✓ Loaded configuration from {config_file}")
             
             # Show available models
@@ -206,7 +206,7 @@ def example_configuration():
 
 def main():
     """Run all multiple models examples."""
-    print("Revo Library - Multiple LLM Models Examples")
+    print("Revos Library - Multiple LLM Models Examples")
     print("=" * 50)
     
     try:

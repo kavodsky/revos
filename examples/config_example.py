@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Configuration examples for the Revo library.
+Configuration examples for the Revos library.
 
 This example demonstrates various ways to configure the library:
 1. Using environment variables
@@ -13,9 +13,9 @@ import os
 import tempfile
 from pathlib import Path
 
-from revo import (
-    RevoMainConfig,
-    RevoConfig,
+from revos import (
+    RevosMainConfig,
+    RevosConfig,
     LLMConfig,
     LoggingConfig,
     TokenManagerConfig,
@@ -43,7 +43,7 @@ def example_environment_variables():
     # Load configuration
     config = get_settings()
     
-    print(f"✓ Revo Client ID: {config.revo.client_id}")
+    print(f"✓ Revos Client ID: {config.revo.client_id}")
     print(f"✓ LLM Model: {config.llm.model}")
     print(f"✓ Log Level: {config.logging.level}")
     print(f"✓ Refresh Interval: {config.token_manager.refresh_interval_minutes} minutes")
@@ -55,8 +55,8 @@ def example_programmatic_configuration():
     print("=" * 35)
     
     # Create configuration programmatically
-    config = RevoMainConfig(
-        revo=RevoConfig(
+    config = RevosMainConfig(
+        revo=RevosConfig(
             client_id="prog_client_id",
             client_secret="prog_client_secret",
             token_url="https://prog.example.com/token",
@@ -89,7 +89,7 @@ def example_programmatic_configuration():
         debug=True
     )
     
-    print(f"✓ Revo URL: {config.revo.token_url}")
+    print(f"✓ Revos URL: {config.revo.token_url}")
     print(f"✓ LLM Model: {config.llm.model}")
     print(f"✓ Temperature: {config.llm.temperature}")
     print(f"✓ Max Tokens: {config.llm.max_tokens}")
@@ -145,7 +145,7 @@ debug: false
         # Load configuration from YAML file
         config = load_config_from_file(yaml_file)
         
-        print(f"✓ Revo Client ID: {config.revo.client_id}")
+        print(f"✓ Revos Client ID: {config.revo.client_id}")
         print(f"✓ Token Buffer: {config.revo.token_buffer_minutes} minutes")
         print(f"✓ LLM Model: {config.llm.model}")
         print(f"✓ Log Level: {config.logging.level}")
@@ -206,7 +206,7 @@ def example_json_configuration():
         # Load configuration from JSON file
         config = load_config_from_file(json_file)
         
-        print(f"✓ Revo Client ID: {config.revo.client_id}")
+        print(f"✓ Revos Client ID: {config.revo.client_id}")
         print(f"✓ Request Timeout: {config.revo.request_timeout} seconds")
         print(f"✓ LLM Temperature: {config.llm.temperature}")
         print(f"✓ Max Tokens: {config.llm.max_tokens}")
@@ -264,9 +264,9 @@ DEBUG=false
     
     try:
         # Load configuration from .env file
-        config = RevoMainConfig(_env_file=env_file)
+        config = RevosMainConfig(_env_file=env_file)
         
-        print(f"✓ Revo Client ID: {config.revo.client_id}")
+        print(f"✓ Revos Client ID: {config.revo.client_id}")
         print(f"✓ Token Buffer: {config.revo.token_buffer_minutes} minutes")
         print(f"✓ LLM Model: {config.llm.model}")
         print(f"✓ Temperature: {config.llm.temperature}")
@@ -284,8 +284,8 @@ def example_save_configuration():
     print("=" * 33)
     
     # Create a configuration
-    config = RevoMainConfig(
-        revo=RevoConfig(
+    config = RevosMainConfig(
+        revo=RevosConfig(
             client_id="save_client_id",
             client_secret="save_client_secret"
         ),
@@ -306,7 +306,7 @@ def example_save_configuration():
         
         # Verify by loading it back
         loaded_config = load_config_from_file(yaml_file)
-        print(f"✓ Loaded Revo Client ID: {loaded_config.revo.client_id}")
+        print(f"✓ Loaded Revos Client ID: {loaded_config.revo.client_id}")
         print(f"✓ Loaded LLM Model: {loaded_config.llm.model}")
         print(f"✓ Loaded Debug Mode: {loaded_config.debug}")
         
@@ -321,8 +321,8 @@ def example_environment_variables_export():
     print("=" * 37)
     
     # Create a configuration
-    config = RevoMainConfig(
-        revo=RevoConfig(
+    config = RevosMainConfig(
+        revo=RevosConfig(
             client_id="export_client_id",
             client_secret="export_client_secret",
             token_url="https://export.example.com/token"
@@ -336,7 +336,7 @@ def example_environment_variables_export():
     
     # Show configuration summary
     print("Configuration summary:")
-    print(f"  Revo API URL: {config.revo.base_url}")
+    print(f"  Revos API URL: {config.revo.base_url}")
     print(f"  LLM Model: {config.llm.model}")
     print(f"  Log Level: {config.logging.level}")
     print(f"  Debug Mode: {config.debug}")
@@ -344,7 +344,7 @@ def example_environment_variables_export():
 
 def main():
     """Run all configuration examples."""
-    print("Revo Library Configuration Examples")
+    print("Revos Library Configuration Examples")
     print("=" * 40)
     
     try:

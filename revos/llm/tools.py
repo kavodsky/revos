@@ -11,7 +11,7 @@ from langchain_core.output_parsers import PydanticOutputParser
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
 
-from ..auth.tokens import get_revo_token, invalidate_revo_token
+from ..auth.tokens import get_revos_token, invalidate_revos_token
 from ..config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -35,8 +35,8 @@ class LangChainExtractor:
     def _initialize_llm(self):
         """Initialize the LLM client."""
         try:
-            # Get token from Revo
-            token = get_revo_token()
+            # Get token from Revos
+            token = get_revos_token()
             
             # Get LLM configuration
             if self.model_name and hasattr(self.settings, 'llm_models'):
@@ -70,8 +70,8 @@ class LangChainExtractor:
         logger.info(f"Refreshing LLM with new token (fallback={use_fallback})...")
         
         try:
-            invalidate_revo_token()
-            token = get_revo_token(force_refresh=True, use_fallback=use_fallback)
+            invalidate_revos_token()
+            token = get_revos_token(force_refresh=True, use_fallback=use_fallback)
             
             llm_config = self.settings.llm
             revo_config = self.settings.revo

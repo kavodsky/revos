@@ -1,7 +1,7 @@
 """
 Background Services and Periodic Tasks
 
-This module provides background services for the Revo library,
+This module provides background services for the Revos library,
 including periodic token refresh and background task management.
 """
 
@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from .refresh import TokenRefreshManager
-from ..auth.exceptions import RevoTokenError
+from ..auth.exceptions import RevosTokenError
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +57,7 @@ class BackgroundTokenManager:
         4. Logs all operations for monitoring and debugging
 
         Raises:
-            RevoTokenError: If background service fails to start
+            RevosTokenError: If background service fails to start
         """
         if self._running:
             logger.warning("Background refresh service is already running")
@@ -76,7 +76,7 @@ class BackgroundTokenManager:
             self._running = False
             logger.error(f"Failed to start background refresh service: {e}")
             logger.error(f"Background service startup traceback: {traceback.format_exc()}")
-            raise RevoTokenError(f"Background service startup failed: {e}")
+            raise RevosTokenError(f"Background service startup failed: {e}")
 
     async def stop_background_refresh(self) -> None:
         """

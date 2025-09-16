@@ -1,14 +1,14 @@
 """
-Revo: A Python library for Revo API authentication and LangChain-based LLM tools.
+Revoss: A Python library for Revoss API authentication and LangChain-based LLM tools.
 
 This library provides comprehensive tools for:
-- Revo API authentication with dual authentication methods
+- Revoss API authentication with dual authentication methods
 - LangChain-based structured data extraction
 - Token management with automatic refresh and fallback mechanisms
 - LLM interaction through OpenAI-compatible APIs
 
 Main Components:
-- RevoTokenManager: Handles Revo API authentication
+- RevossTokenManager: Handles Revoss API authentication
 - LangChainExtractor: Extracts structured data using LLMs
 - TokenManager: Manages token lifecycle and refresh operations
 """
@@ -19,23 +19,23 @@ __email__ = "your.email@example.com"
 
 # Core classes and functions
 from .auth import (
-    RevoTokenManager,
-    get_revo_token,
-    invalidate_revo_token,
+    RevosTokenManager,
+    get_revos_token,
+    invalidate_revos_token,
     get_consecutive_failures,
     reset_token_manager,
     get_token_info,
-    RevoError,
-    RevoAuthenticationError,
-    RevoConfigurationError,
-    RevoTokenError,
-    RevoAPIError,
-    RevoValidationError,
+    RevosError,
+    RevosAuthenticationError,
+    RevosConfigurationError,
+    RevosTokenError,
+    RevosAPIError,
+    RevosValidationError,
 )
 
 from .config import (
-    RevoMainConfig,
-    RevoConfig,
+    RevosMainConfig,
+    RevosConfig,
     LLMConfig,
     LLMModelsConfig,
     LLMModelConfig,
@@ -70,8 +70,8 @@ __all__ = [
     "__email__",
     
     # Configuration
-    "RevoMainConfig",
-    "RevoConfig", 
+    "RevosMainConfig",
+    "RevosConfig", 
     "LLMConfig",
     "LLMModelsConfig",
     "LLMModelConfig",
@@ -86,21 +86,21 @@ __all__ = [
     "create_production_config",
     "settings",
     
-    # Revo authentication
-    "RevoTokenManager",
-    "get_revo_token",
-    "invalidate_revo_token", 
+    # Revos authentication
+    "RevosTokenManager",
+    "get_revos_token",
+    "invalidate_revos_token", 
     "get_consecutive_failures",
     "reset_token_manager",
     "get_token_info",
     
     # Exceptions
-    "RevoError",
-    "RevoAuthenticationError",
-    "RevoConfigurationError",
-    "RevoTokenError",
-    "RevoAPIError",
-    "RevoValidationError",
+    "RevosError",
+    "RevosAuthenticationError",
+    "RevosConfigurationError",
+    "RevosTokenError",
+    "RevosAPIError",
+    "RevosValidationError",
     
     # LangChain tools
     "LangChainExtractor",

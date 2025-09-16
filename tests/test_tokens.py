@@ -7,10 +7,10 @@ import asyncio
 from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime, timedelta
 
-from revo.tokens.refresh import TokenRefreshManager
-from revo.tokens.background import BackgroundTokenManager
-from revo.tokens.manager import TokenManager
-from revo.auth.exceptions import RevoTokenError
+from revos.tokens.refresh import TokenRefreshManager
+from revos.tokens.background import BackgroundTokenManager
+from revos.tokens.manager import TokenManager
+from revos.auth.exceptions import RevosTokenError
 
 
 class TestTokenRefreshManager:
@@ -41,8 +41,8 @@ class TestTokenRefreshManager:
         
         assert self.refresh_manager.should_refresh_token() is True
     
-    @patch('revo.tokens.refresh.invalidate_revo_token')
-    @patch('revo.tokens.refresh.get_revo_token')
+    @patch('revos.auth.tokens.invalidate_revos_token')
+    @patch('revos.auth.tokens.get_revos_token')
     def test_refresh_extractor_success(self, mock_get_token, mock_invalidate):
         """Test successful token refresh."""
         mock_get_token.return_value = "new-test-token"
@@ -54,8 +54,8 @@ class TestTokenRefreshManager:
         mock_invalidate.assert_called_once()
         mock_get_token.assert_called_once_with(force_refresh=True)
     
-    @patch('revo.tokens.refresh.invalidate_revo_token')
-    @patch('revo.tokens.refresh.get_revo_token')
+    @patch('revos.auth.tokens.invalidate_revos_token')
+    @patch('revos.auth.tokens.get_revos_token')
     def test_refresh_extractor_failure(self, mock_get_token, mock_invalidate):
         """Test token refresh failure."""
         mock_get_token.side_effect = Exception("Token fetch failed")
@@ -67,15 +67,15 @@ class TestTokenRefreshManager:
         mock_invalidate.assert_called_once()
         mock_get_token.assert_called_once_with(force_refresh=True)
     
-    @patch('revo.tokens.refresh.invalidate_revo_token')
+    @patch('revos.auth.tokens.invalidate_revos_token')
     def test_refresh_extractor_exception(self, mock_invalidate):
         """Test token refresh with exception."""
         mock_invalidate.side_effect = Exception("Invalidation failed")
         
-        with pytest.raises(RevoTokenError, match="Token refresh failed"):
+        with pytest.raises(RevosTokenError, match="Token refresh failed"):
             self.refresh_manager.refresh_extractor()
     
-    @patch('revo.tokens.refresh.get_revo_token')
+    @patch('revos.auth.tokens.get_revos_token')
     def test_test_token_acquisition_success(self, mock_get_token):
         """Test successful token acquisition test."""
         mock_get_token.return_value = "valid-token"
@@ -85,7 +85,7 @@ class TestTokenRefreshManager:
         assert result is True
         mock_get_token.assert_called_once_with(force_refresh=True)
     
-    @patch('revo.tokens.refresh.get_revo_token')
+    @patch('revos.auth.tokens.get_revos_token')
     def test_test_token_acquisition_invalid_token(self, mock_get_token):
         """Test token acquisition test with invalid token."""
         mock_get_token.return_value = None
@@ -94,7 +94,7 @@ class TestTokenRefreshManager:
         
         assert result is False
     
-    @patch('revo.tokens.refresh.get_revo_token')
+    @patch('revos.auth.tokens.get_revos_token')
     def test_test_token_acquisition_empty_token(self, mock_get_token):
         """Test token acquisition test with empty token."""
         mock_get_token.return_value = ""
@@ -103,7 +103,7 @@ class TestTokenRefreshManager:
         
         assert result is False
     
-    @patch('revo.tokens.refresh.get_revo_token')
+    @patch('revos.auth.tokens.get_revos_token')
     def test_test_token_acquisition_exception(self, mock_get_token):
         """Test token acquisition test with exception."""
         mock_get_token.side_effect = Exception("Token fetch failed")
@@ -205,7 +205,7 @@ class TestBackgroundTokenManager:
     async def test_start_background_refresh_failure(self):
         """Test background refresh service start failure."""
         with patch('asyncio.create_task', side_effect=Exception("Task creation failed")):
-            with pytest.raises(RevoTokenError, match="Background service startup failed"):
+            with pytest.raises(RevosTokenError, match="Background service startup failed"):
                 await self.background_manager.start_background_refresh()
             
             assert self.background_manager._running is False
@@ -240,13 +240,13 @@ class TestBackgroundTokenManager:
                 mock_should_refresh.return_value = True
                 mock_refresh.return_value = True
                 
-                # Mock sleep to prevent actual waiting
+                # Mock sleep to prevent actual waiting and make it raise CancelledError
                 with patch('asyncio.sleep') as mock_sleep:
-                    # Make the loop run once and then stop
-                    mock_sleep.side_effect = [None, asyncio.CancelledError()]
+                    # Make the loop run once and then raise CancelledError
+                    mock_sleep.side_effect = asyncio.CancelledError()
                     
-                    with pytest.raises(asyncio.CancelledError):
-                        await self.background_manager._background_refresh_loop()
+                    # The loop should handle CancelledError gracefully and not re-raise it
+                    await self.background_manager._background_refresh_loop()
                     
                     mock_should_refresh.assert_called()
                     mock_refresh.assert_called()
@@ -259,13 +259,13 @@ class TestBackgroundTokenManager:
         with patch.object(self.background_manager.refresh_manager, 'should_refresh_token') as mock_should_refresh:
             mock_should_refresh.side_effect = Exception("Check failed")
             
-            # Mock sleep to prevent actual waiting
+            # Mock sleep to prevent actual waiting and make it raise CancelledError
             with patch('asyncio.sleep') as mock_sleep:
-                # Make the loop run once and then stop
-                mock_sleep.side_effect = [None, asyncio.CancelledError()]
+                # Make the loop run once and then raise CancelledError
+                mock_sleep.side_effect = asyncio.CancelledError()
                 
-                with pytest.raises(asyncio.CancelledError):
-                    await self.background_manager._background_refresh_loop()
+                # The loop should handle both the exception and CancelledError gracefully
+                await self.background_manager._background_refresh_loop()
                 
                 # Should handle the error gracefully and continue
 
@@ -308,7 +308,7 @@ class TestTokenManager:
         assert result is True
         mock_is_running.assert_called_once()
     
-    @patch.object(BackgroundTokenManager, 'get_last_refresh_time')
+    @patch.object(TokenRefreshManager, 'get_last_refresh_time')
     def test_get_last_refresh_time(self, mock_get_time):
         """Test getting last refresh time."""
         test_time = datetime.now()
@@ -343,8 +343,8 @@ class TestTokenManager:
 class TestTokenIntegration:
     """Integration tests for token management."""
     
-    @patch('revo.tokens.refresh.get_revo_token')
-    @patch('revo.tokens.refresh.invalidate_revo_token')
+    @patch('revos.auth.tokens.get_revos_token')
+    @patch('revos.auth.tokens.invalidate_revos_token')
     def test_refresh_workflow(self, mock_invalidate, mock_get_token):
         """Test complete token refresh workflow."""
         mock_get_token.return_value = "refreshed-token"

@@ -1,11 +1,11 @@
-# Revo Python Library Makefile
+# Revos Python Library Makefile
 # Provides common development and build tasks
 
 .PHONY: help install install-dev test test-verbose test-coverage lint format clean build publish docs
 
 # Default target
 help: ## Show this help message
-	@echo "Revo Python Library - Available Commands:"
+	@echo "Revos Python Library - Available Commands:"
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
@@ -24,7 +24,7 @@ test-verbose: ## Run tests with verbose output and short tracebacks
 	uv run pytest tests/ -v --tb=short
 
 test-coverage: ## Run tests with coverage report
-	uv run pytest tests/ --cov=revo --cov-report=html --cov-report=term
+	uv run pytest tests/ --cov=revos --cov-report=html --cov-report=term
 
 test-auth: ## Run only authentication tests
 	uv run pytest tests/test_auth.py -v
@@ -161,13 +161,6 @@ version-bump: ## Bump version (usage: make version-bump TYPE=patch|minor|major)
 	@echo "Bumping $(TYPE) version..."
 	@uv run python -c "import tomllib; import tomli_w; data = tomllib.load(open('pyproject.toml', 'rb')); data['project']['version'] = '$(shell uv run python -c "import revo; print(revo.__version__)")'; tomli_w.dump(data, open('pyproject.toml', 'wb'))"
 
-# Database and data (if needed in future)
-db-migrate: ## Run database migrations (placeholder)
-	@echo "Database migrations not implemented yet"
-
-db-reset: ## Reset database (placeholder)
-	@echo "Database reset not implemented yet"
-
 # Monitoring and debugging
 debug: ## Run with debug logging
 	REVO_LOG_LEVEL=DEBUG uv run python -c "import revo; print('Debug mode enabled')"
@@ -207,6 +200,36 @@ help-dev: ## Show help for development commands
 	@echo "  check         - Run all quality checks"
 	@echo "  quick-test    - Quick test run for development"
 	@echo "  watch-test    - Watch for changes and run tests"
+	@echo ""
+	@echo "📚 Documentation:"
+	@echo "  docs          - Build documentation"
+	@echo "  docs-serve    - Start documentation development server"
+	@echo "  docs-build    - Build documentation for production"
+	@echo "  docs-deploy   - Deploy documentation to GitHub Pages"
+	@echo "  docs-clean    - Clean documentation build files"
+
+# Documentation commands
+.PHONY: docs docs-serve docs-build docs-deploy docs-clean
+
+docs: docs-build
+	@echo "📚 Documentation built successfully"
+
+docs-serve:
+	@echo "🚀 Starting MkDocs development server..."
+	@echo "📖 Open http://localhost:8000 in your browser"
+	uv run mkdocs serve
+
+docs-build:
+	@echo "🔨 Building MkDocs documentation..."
+	uv run mkdocs build
+
+docs-deploy:
+	@echo "🚀 Deploying documentation to GitHub Pages..."
+	uv run mkdocs gh-deploy
+
+docs-clean:
+	@echo "🧹 Cleaning documentation build files..."
+	rm -rf site/
 
 # Default target when no arguments are provided
 .DEFAULT_GOAL := help

@@ -1,7 +1,7 @@
 """
 Token Management Module
 
-This module provides token management functionality for the Revo library,
+This module provides token management functionality for the Revos library,
 including refresh logic, background services, and unified token management.
 """
 

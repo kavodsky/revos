@@ -1,24 +1,24 @@
 """
-Configuration package for the Revo library.
+Configuration package for the Revos library.
 
 This package provides a modular configuration system with separate
 modules for different configuration aspects:
 
-- api: Revo API authentication and connection settings
+- api: Revos API authentication and connection settings
 - llm: LLM model and generation parameters
 - logging: Logging configuration and file rotation
 - token: Token management and refresh settings
 - main: Main configuration class that combines all sections
 
 Usage:
-    from revo.config import get_settings, RevoMainConfig
-    from revo.config.api import RevoConfig
+    from revo.config import get_settings, RevosMainConfig
+    from revo.config.api import RevosConfig
     from revo.config.llm import LLMConfig
 """
 
 # Main configuration classes and functions
 from .main import (
-    RevoMainConfig,
+    RevosMainConfig,
     get_settings,
     reload_settings,
     load_config_from_file,
@@ -34,7 +34,7 @@ from .factory import (
 )
 
 # Individual configuration classes
-from .api import RevoConfig
+from .api import RevosConfig
 from .llm import LLMConfig
 from .llm_models import LLMModelsConfig, LLMModelConfig
 from .logging import LoggingConfig
@@ -43,7 +43,7 @@ from .token import TokenManagerConfig
 
 __all__ = [
     # Main configuration
-    "RevoMainConfig",
+    "RevosMainConfig",
     "get_settings",
     "reload_settings", 
     "load_config_from_file",
@@ -56,7 +56,7 @@ __all__ = [
     "create_production_config",
     
     # Individual configuration classes
-    "RevoConfig",
+    "RevosConfig",
     "LLMConfig",
     "LLMModelsConfig",
     "LLMModelConfig",

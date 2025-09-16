@@ -7,33 +7,33 @@ import os
 from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime, timedelta
 
-from revo.auth.core import RevoTokenManager
-from revo.auth.exceptions import RevoAuthenticationError, RevoAPIError
-from revo.auth.tokens import get_revo_token, invalidate_revo_token
+from revos.auth.core import RevosTokenManager
+from revos.auth.exceptions import RevosAuthenticationError, RevosAPIError
+from revos.auth.tokens import get_revos_token, invalidate_revos_token
 
 
-class TestRevoTokenManager:
-    """Test cases for RevoTokenManager."""
+class TestRevosTokenManager:
+    """Test cases for RevosTokenManager."""
     
     def setup_method(self):
         """Set up test fixtures."""
         self.settings_mock = Mock()
-        self.settings_mock.revo.client_id = "test-client-id"
-        self.settings_mock.revo.client_secret = "test-client-secret"
-        self.settings_mock.revo.token_url = "https://test.com/oauth/token"
-        self.settings_mock.revo.base_url = "https://test.com/api"
-        self.settings_mock.revo.token_buffer_minutes = 5
-        self.settings_mock.revo.max_retries = 3
-        self.settings_mock.revo.request_timeout = 30
+        self.settings_mock.revos.client_id = "test-client-id"
+        self.settings_mock.revos.client_secret = "test-client-secret"
+        self.settings_mock.revos.token_url = "https://test.com/oauth/token"
+        self.settings_mock.revos.base_url = "https://test.com/api"
+        self.settings_mock.revos.token_buffer_minutes = 5
+        self.settings_mock.revos.max_retries = 3
+        self.settings_mock.revos.request_timeout = 30
         
         # Add token_manager config
         self.settings_mock.token_manager.max_failures_before_fallback = 1
         
-        with patch('revo.auth.core.get_settings', return_value=self.settings_mock):
-            self.token_manager = RevoTokenManager()
+        with patch('revos.auth.core.get_settings', return_value=self.settings_mock):
+            self.token_manager = RevosTokenManager()
     
     def test_init(self):
-        """Test RevoTokenManager initialization."""
+        """Test RevosTokenManager initialization."""
         assert self.token_manager._token is None
         assert self.token_manager._token_expires_at is None
         assert self.token_manager.consecutive_failures == 0
@@ -155,7 +155,7 @@ class TestRevoTokenManager:
         
         assert result == "valid-token"
     
-    @patch.object(RevoTokenManager, '_fetch_new_token')
+    @patch.object(RevosTokenManager, '_fetch_new_token')
     def test_fetch_and_update_token_success(self, mock_fetch):
         """Test successful token fetch and update."""
         # Mock successful token fetch
@@ -172,7 +172,7 @@ class TestRevoTokenManager:
         assert self.token_manager._token_expires_at is not None
         assert self.token_manager.consecutive_failures == 0
     
-    @patch.object(RevoTokenManager, '_fetch_new_token')
+    @patch.object(RevosTokenManager, '_fetch_new_token')
     def test_fetch_and_update_token_failure_with_fallback(self, mock_fetch):
         """Test token fetch failure with fallback success."""
         # Mock original method failure
@@ -203,15 +203,15 @@ class TestTokenFunctions:
     def setup_method(self):
         """Set up test fixtures."""
         # Clear any existing token manager
-        with patch('revo.auth.tokens._token_manager', None):
+        with patch('revos.auth.tokens._token_manager', None):
             pass
     
-    @patch('revo.auth.tokens._token_manager')
-    def test_get_revo_token(self, mock_token_manager):
-        """Test get_revo_token function."""
+    @patch('revos.auth.tokens._token_manager')
+    def test_get_revos_token(self, mock_token_manager):
+        """Test get_revos_token function."""
         mock_token_manager.get_token.return_value = "test-token"
         
-        result = get_revo_token()
+        result = get_revos_token()
         
         assert result == "test-token"
         mock_token_manager.get_token.assert_called_once_with(
@@ -219,12 +219,12 @@ class TestTokenFunctions:
             use_fallback=False
         )
     
-    @patch('revo.auth.tokens._token_manager')
-    def test_get_revo_token_with_params(self, mock_token_manager):
-        """Test get_revo_token function with parameters."""
+    @patch('revos.auth.tokens._token_manager')
+    def test_get_revos_token_with_params(self, mock_token_manager):
+        """Test get_revos_token function with parameters."""
         mock_token_manager.get_token.return_value = "test-token"
         
-        result = get_revo_token(force_refresh=True, use_fallback=True)
+        result = get_revos_token(force_refresh=True, use_fallback=True)
         
         assert result == "test-token"
         mock_token_manager.get_token.assert_called_once_with(
@@ -232,10 +232,10 @@ class TestTokenFunctions:
             use_fallback=True
         )
     
-    @patch('revo.auth.tokens._token_manager')
-    def test_invalidate_revo_token(self, mock_token_manager):
-        """Test invalidate_revo_token function."""
-        invalidate_revo_token()
+    @patch('revos.auth.tokens._token_manager')
+    def test_invalidate_revos_token(self, mock_token_manager):
+        """Test invalidate_revos_token function."""
+        invalidate_revos_token()
         
         mock_token_manager.invalidate_token.assert_called_once()
 
@@ -244,13 +244,13 @@ class TestExceptions:
     """Test cases for custom exceptions."""
     
     def test_revo_authentication_error(self):
-        """Test RevoAuthenticationError exception."""
-        error = RevoAuthenticationError("Authentication failed")
+        """Test RevosAuthenticationError exception."""
+        error = RevosAuthenticationError("Authentication failed")
         assert str(error) == "Authentication failed"
         assert isinstance(error, Exception)
     
     def test_revo_api_error(self):
-        """Test RevoAPIError exception."""
-        error = RevoAPIError("API call failed")
+        """Test RevosAPIError exception."""
+        error = RevosAPIError("API call failed")
         assert str(error) == "API call failed"
         assert isinstance(error, Exception)

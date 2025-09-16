@@ -1,5 +1,5 @@
 """
-Main configuration class for the Revo library.
+Main configuration class for the Revos library.
 
 This module provides the main configuration class that combines
 all configuration sections and provides utility methods for
@@ -12,15 +12,15 @@ from typing import Optional, Dict, Any
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from .api import RevoConfig
+from .api import RevosConfig
 from .llm import LLMConfig
 from .llm_models import LLMModelsConfig
 from .logging import LoggingConfig
 from .token import TokenManagerConfig
 
 
-class RevoMainConfig(BaseSettings):
-    """Main configuration class for the Revo library."""
+class RevosMainConfig(BaseSettings):
+    """Main configuration class for the Revos library."""
     
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -30,7 +30,7 @@ class RevoMainConfig(BaseSettings):
     )
     
     # Nested configuration sections
-    revo: RevoConfig = Field(default_factory=RevoConfig)
+    revo: RevosConfig = Field(default_factory=RevosConfig)
     llm: LLMConfig = Field(default_factory=LLMConfig)
     llm_models: LLMModelsConfig = Field(default_factory=LLMModelsConfig)
     logging: LoggingConfig = Field(default_factory=LoggingConfig)
@@ -44,7 +44,7 @@ class RevoMainConfig(BaseSettings):
         if env_file:
             # Create nested configs with the same env file
             if 'revo' not in kwargs:
-                kwargs['revo'] = RevoConfig(_env_file=env_file)
+                kwargs['revo'] = RevosConfig(_env_file=env_file)
             if 'llm' not in kwargs:
                 kwargs['llm'] = LLMConfig(_env_file=env_file)
             if 'llm_models' not in kwargs:
@@ -77,7 +77,7 @@ class RevoMainConfig(BaseSettings):
         return self
     
     @classmethod
-    def from_file(cls, config_path: str) -> 'RevoMainConfig':
+    def from_file(cls, config_path: str) -> 'RevosMainConfig':
         """Load configuration from a file."""
         config_file = Path(config_path)
         
@@ -122,28 +122,28 @@ class RevoMainConfig(BaseSettings):
 
 
 # Global configuration instance (lazy initialization)
-_settings: Optional[RevoMainConfig] = None
+_settings: Optional[RevosMainConfig] = None
 
 
-def get_settings() -> RevoMainConfig:
+def get_settings() -> RevosMainConfig:
     """Get the global settings instance."""
     global _settings
     if _settings is None:
-        _settings = RevoMainConfig()
+        _settings = RevosMainConfig()
     return _settings
 
 
-def reload_settings() -> RevoMainConfig:
+def reload_settings() -> RevosMainConfig:
     """Reload settings from environment and config files."""
     global _settings
-    _settings = RevoMainConfig()
+    _settings = RevosMainConfig()
     return _settings
 
 
-def load_config_from_file(config_path: str) -> RevoMainConfig:
+def load_config_from_file(config_path: str) -> RevosMainConfig:
     """Load configuration from a file and set as global settings."""
     global _settings
-    _settings = RevoMainConfig.from_file(config_path)
+    _settings = RevosMainConfig.from_file(config_path)
     return _settings
 
 
@@ -152,6 +152,6 @@ from .factory import create_config_with_prefixes
 
 
 # For backward compatibility, create a function that returns the settings
-def settings() -> RevoMainConfig:
+def settings() -> RevosMainConfig:
     """Get the global settings instance (function for backward compatibility)."""
     return get_settings()

@@ -7,7 +7,7 @@ import asyncio
 from unittest.mock import Mock, patch, MagicMock, AsyncMock
 from pydantic import BaseModel
 
-from revo.llm.tools import (
+from revos.llm.tools import (
     LangChainExtractor,
     get_langchain_extractor,
     create_all_extractors,
@@ -46,15 +46,15 @@ class TestLangChainExtractor:
         with pytest.raises(ValueError, match="model_name is required"):
             LangChainExtractor("")
     
-    @patch('revo.llm.tools.get_revo_token')
-    @patch('revo.llm.tools.ChatOpenAI')
+    @patch('revos.llm.tools.get_revos_token')
+    @patch('revos.llm.tools.ChatOpenAI')
     def test_init_success(self, mock_chat_openai, mock_get_token):
         """Test successful LangChainExtractor initialization."""
         mock_get_token.return_value = "test-token"
         mock_llm = Mock()
         mock_chat_openai.return_value = mock_llm
         
-        with patch('revo.llm.tools.get_settings', return_value=self.settings_mock):
+        with patch('revos.llm.tools.get_settings', return_value=self.settings_mock):
             extractor = LangChainExtractor("gpt-3.5-turbo")
             
             assert extractor.model_name == "gpt-3.5-turbo"
@@ -62,28 +62,28 @@ class TestLangChainExtractor:
             assert extractor.llm == mock_llm
             mock_chat_openai.assert_called_once()
     
-    @patch('revo.llm.tools.get_revo_token')
+    @patch('revos.llm.tools.get_revos_token')
     def test_init_with_custom_name(self, mock_get_token):
         """Test LangChainExtractor initialization with custom name."""
         mock_get_token.return_value = "test-token"
         
-        with patch('revo.llm.tools.get_settings', return_value=self.settings_mock):
-            with patch('revo.llm.tools.ChatOpenAI'):
+        with patch('revos.llm.tools.get_settings', return_value=self.settings_mock):
+            with patch('revos.llm.tools.ChatOpenAI'):
                 extractor = LangChainExtractor("gpt-4", name="my_custom_extractor")
                 
                 assert extractor.name == "my_custom_extractor"
     
-    @patch('revo.llm.tools.get_revo_token')
+    @patch('revos.llm.tools.get_revos_token')
     def test_init_auth_failure(self, mock_get_token):
         """Test LangChainExtractor initialization with auth failure."""
         mock_get_token.side_effect = Exception("Authentication failed")
         
-        with patch('revo.llm.tools.get_settings', return_value=self.settings_mock):
+        with patch('revos.llm.tools.get_settings', return_value=self.settings_mock):
             with pytest.raises(RuntimeError, match="Cannot initialize LangChainExtractor"):
                 LangChainExtractor("gpt-3.5-turbo")
     
-    @patch('revo.llm.tools.get_revo_token')
-    @patch('revo.llm.tools.ChatOpenAI')
+    @patch('revos.llm.tools.get_revos_token')
+    @patch('revos.llm.tools.ChatOpenAI')
     def test_init_with_multiple_models_config(self, mock_chat_openai, mock_get_token):
         """Test LangChainExtractor initialization with multiple models config."""
         mock_get_token.return_value = "test-token"
@@ -101,7 +101,7 @@ class TestLangChainExtractor:
             presence_penalty=0.3
         )
         
-        with patch('revo.llm.tools.get_settings', return_value=self.settings_mock):
+        with patch('revos.llm.tools.get_settings', return_value=self.settings_mock):
             extractor = LangChainExtractor("gpt-4")
             
             assert extractor.model_name == "gpt-4"
@@ -109,15 +109,15 @@ class TestLangChainExtractor:
     
     def test_get_current_model(self):
         """Test get_current_model method."""
-        with patch('revo.llm.tools.get_settings', return_value=self.settings_mock):
-            with patch('revo.llm.tools.get_revo_token', return_value="test-token"):
-                with patch('revo.llm.tools.ChatOpenAI'):
+        with patch('revos.llm.tools.get_settings', return_value=self.settings_mock):
+            with patch('revos.llm.tools.get_revos_token', return_value="test-token"):
+                with patch('revos.llm.tools.ChatOpenAI'):
                     extractor = LangChainExtractor("gpt-4")
                     
                     assert extractor.get_current_model() == "gpt-4"
     
-    @patch('revo.llm.tools.get_revo_token')
-    @patch('revo.llm.tools.ChatOpenAI')
+    @patch('revos.llm.tools.get_revos_token')
+    @patch('revos.llm.tools.ChatOpenAI')
     def test_extract_structured_data_success(self, mock_chat_openai, mock_get_token):
         """Test successful structured data extraction."""
         mock_get_token.return_value = "test-token"
@@ -127,7 +127,7 @@ class TestLangChainExtractor:
         mock_llm.ainvoke = AsyncMock(return_value=mock_response)
         mock_chat_openai.return_value = mock_llm
         
-        with patch('revo.llm.tools.get_settings', return_value=self.settings_mock):
+        with patch('revos.llm.tools.get_settings', return_value=self.settings_mock):
             extractor = LangChainExtractor("gpt-3.5-turbo")
             
             result = extractor.extract_structured_data(
@@ -140,8 +140,8 @@ class TestLangChainExtractor:
             assert result.result == "success"
             assert result.confidence == 0.95
     
-    @patch('revo.llm.tools.get_revo_token')
-    @patch('revo.llm.tools.ChatOpenAI')
+    @patch('revos.llm.tools.get_revos_token')
+    @patch('revos.llm.tools.ChatOpenAI')
     def test_extract_structured_data_failure(self, mock_chat_openai, mock_get_token):
         """Test structured data extraction failure."""
         mock_get_token.return_value = "test-token"
@@ -149,7 +149,7 @@ class TestLangChainExtractor:
         mock_llm.ainvoke = AsyncMock(side_effect=Exception("LLM call failed"))
         mock_chat_openai.return_value = mock_llm
         
-        with patch('revo.llm.tools.get_settings', return_value=self.settings_mock):
+        with patch('revos.llm.tools.get_settings', return_value=self.settings_mock):
             extractor = LangChainExtractor("gpt-3.5-turbo")
             
             # Should raise RuntimeError when LLM fails
@@ -159,8 +159,8 @@ class TestLangChainExtractor:
                     target_class=MockResult
                 )
     
-    @patch('revo.llm.tools.get_revo_token')
-    @patch('revo.llm.tools.ChatOpenAI')
+    @patch('revos.llm.tools.get_revos_token')
+    @patch('revos.llm.tools.ChatOpenAI')
     def test_extract_async_success(self, mock_chat_openai, mock_get_token):
         """Test successful async extraction."""
         mock_get_token.return_value = "test-token"
@@ -170,7 +170,7 @@ class TestLangChainExtractor:
         mock_llm.ainvoke = AsyncMock(return_value=mock_response)
         mock_chat_openai.return_value = mock_llm
         
-        with patch('revo.llm.tools.get_settings', return_value=self.settings_mock):
+        with patch('revos.llm.tools.get_settings', return_value=self.settings_mock):
             extractor = LangChainExtractor("gpt-3.5-turbo")
             
             async def run_test():
@@ -193,7 +193,7 @@ class TestLLMFunctions:
     def setup_method(self):
         """Set up test fixtures."""
         # Clear any existing extractors
-        with patch('revo.llm.tools._langchain_extractors', {}):
+        with patch('revos.llm.tools._langchain_extractors', {}):
             pass
     
     def test_get_langchain_extractor_requires_model_name(self):
@@ -204,7 +204,7 @@ class TestLLMFunctions:
         with pytest.raises(ValueError, match="model_name is required"):
             get_langchain_extractor("")
     
-    @patch('revo.llm.tools.LangChainExtractor')
+    @patch('revos.llm.tools.LangChainExtractor')
     def test_get_langchain_extractor_success(self, mock_extractor_class):
         """Test successful get_langchain_extractor call."""
         mock_extractor = Mock()
@@ -215,11 +215,15 @@ class TestLLMFunctions:
         assert result == mock_extractor
         mock_extractor_class.assert_called_once_with(model_name="gpt-4")
     
-    @patch('revo.llm.tools.get_revo_token')
-    @patch('revo.llm.tools.LangChainExtractor')
-    @patch('revo.llm.tools.get_settings')
+    @patch('revos.llm.tools.get_revos_token')
+    @patch('revos.llm.tools.LangChainExtractor')
+    @patch('revos.llm.tools.get_settings')
     def test_get_langchain_extractor_caching(self, mock_get_settings, mock_extractor_class, mock_get_token):
         """Test that get_langchain_extractor caches extractors."""
+        # Clear the cache first
+        from revos.llm.tools import _langchain_extractors
+        _langchain_extractors.clear()
+        
         mock_get_token.return_value = "test-token"
         mock_extractor = Mock()
         mock_extractor_class.return_value = mock_extractor
@@ -239,7 +243,7 @@ class TestLLMFunctions:
         assert result1 is result2
         mock_extractor_class.assert_called_once()
     
-    @patch('revo.llm.tools.get_settings')
+    @patch('revos.llm.tools.get_settings')
     def test_create_all_extractors_success(self, mock_get_settings):
         """Test successful create_all_extractors call."""
         # Mock settings with llm_models
@@ -251,7 +255,7 @@ class TestLLMFunctions:
         }
         mock_get_settings.return_value = mock_settings
         
-        with patch('revo.llm.tools.LangChainExtractor') as mock_extractor_class:
+        with patch('revos.llm.tools.LangChainExtractor') as mock_extractor_class:
             mock_extractor1 = Mock()
             mock_extractor2 = Mock()
             mock_extractor_class.side_effect = [mock_extractor1, mock_extractor2]
@@ -265,7 +269,7 @@ class TestLLMFunctions:
             assert result["gpt-4"] == mock_extractor2
             assert mock_extractor_class.call_count == 2
     
-    @patch('revo.llm.tools.get_settings')
+    @patch('revos.llm.tools.get_settings')
     def test_create_all_extractors_no_models(self, mock_get_settings):
         """Test create_all_extractors with no models configured."""
         # Mock settings without llm_models
@@ -277,7 +281,7 @@ class TestLLMFunctions:
         with pytest.raises(ValueError, match="No models configured"):
             create_all_extractors()
     
-    @patch('revo.llm.tools.get_settings')
+    @patch('revos.llm.tools.get_settings')
     def test_create_all_extractors_empty_models(self, mock_get_settings):
         """Test create_all_extractors with empty models."""
         # Mock settings with empty llm_models
@@ -289,7 +293,7 @@ class TestLLMFunctions:
         with pytest.raises(ValueError, match="No models configured"):
             create_all_extractors()
     
-    @patch('revo.llm.tools.get_settings')
+    @patch('revos.llm.tools.get_settings')
     def test_list_available_extractors_success(self, mock_get_settings):
         """Test successful list_available_extractors call."""
         # Mock settings with llm_models
@@ -309,7 +313,7 @@ class TestLLMFunctions:
             "gpt-4": "Capable model"
         }
     
-    @patch('revo.llm.tools.get_settings')
+    @patch('revos.llm.tools.get_settings')
     def test_list_available_extractors_no_models(self, mock_get_settings):
         """Test list_available_extractors with no models configured."""
         # Mock settings without llm_models
@@ -321,7 +325,7 @@ class TestLLMFunctions:
         with pytest.raises(ValueError, match="No models configured"):
             list_available_extractors()
     
-    @patch('revo.llm.tools.get_settings')
+    @patch('revos.llm.tools.get_settings')
     def test_list_available_extractors_empty_models(self, mock_get_settings):
         """Test list_available_extractors with empty models."""
         # Mock settings with empty llm_models
@@ -337,21 +341,21 @@ class TestLLMFunctions:
 class TestLLMIntegration:
     """Integration tests for LLM functionality."""
     
-    @patch('revo.llm.tools.get_revo_token')
-    @patch('revo.llm.tools.ChatOpenAI')
+    @patch('revos.llm.tools.get_revos_token')
+    @patch('revos.llm.tools.ChatOpenAI')
     def test_full_extraction_workflow(self, mock_chat_openai, mock_get_token):
         """Test complete extraction workflow."""
         mock_get_token.return_value = "test-token"
         mock_llm = Mock()
         mock_response = Mock()
         mock_response.content = '{"task": "integration test", "result": "workflow success", "confidence": 0.98}'
-        mock_llm.invoke.return_value = mock_response
+        mock_llm.ainvoke = AsyncMock(return_value=mock_response)
         mock_chat_openai.return_value = mock_llm
         
         settings_mock = Mock()
-        settings_mock.revo.client_id = "test-client-id"
-        settings_mock.revo.client_secret = "test-client-secret"
-        settings_mock.revo.base_url = "https://test.com/api"
+        settings_mock.revos.client_id = "test-client-id"
+        settings_mock.revos.client_secret = "test-client-secret"
+        settings_mock.revos.base_url = "https://test.com/api"
         settings_mock.llm.model = "gpt-3.5-turbo"
         settings_mock.llm.temperature = 0.1
         settings_mock.llm.max_tokens = 1000
@@ -359,7 +363,7 @@ class TestLLMIntegration:
         settings_mock.llm.frequency_penalty = 0.0
         settings_mock.llm.presence_penalty = 0.0
         
-        with patch('revo.llm.tools.get_settings', return_value=settings_mock):
+        with patch('revos.llm.tools.get_settings', return_value=settings_mock):
             # Create extractor
             extractor = get_langchain_extractor("gpt-3.5-turbo")
             
@@ -376,6 +380,6 @@ class TestLLMIntegration:
             assert result.confidence == 0.98
             
             # Verify LLM was called correctly
-            mock_llm.invoke.assert_called_once()
-            call_args = mock_llm.invoke.call_args[0][0]
+            mock_llm.ainvoke.assert_called_once()
+            call_args = mock_llm.ainvoke.call_args[0][0]
             assert len(call_args) == 1  # Should be a list with one message

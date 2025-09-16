@@ -12,13 +12,13 @@ from unittest.mock import Mock, patch
 def mock_settings():
     """Mock settings for testing."""
     settings = Mock()
-    settings.revo.client_id = "test-client-id"
-    settings.revo.client_secret = "test-client-secret"
-    settings.revo.token_url = "https://test.com/oauth/token"
-    settings.revo.base_url = "https://test.com/api"
-    settings.revo.token_buffer_minutes = 5
-    settings.revo.max_retries = 3
-    settings.revo.request_timeout = 30
+    settings.revos.client_id = "test-client-id"
+    settings.revos.client_secret = "test-client-secret"
+    settings.revos.token_url = "https://test.com/oauth/token"
+    settings.revos.base_url = "https://test.com/api"
+    settings.revos.token_buffer_minutes = 5
+    settings.revos.max_retries = 3
+    settings.revos.request_timeout = 30
     
     settings.llm.model = "gpt-3.5-turbo"
     settings.llm.temperature = 0.1
@@ -33,7 +33,7 @@ def mock_settings():
 @pytest.fixture
 def mock_llm_models_config():
     """Mock LLM models configuration for testing."""
-    from revo.config.llm_models import LLMModelConfig, LLMModelsConfig
+    from revos.config.llm_models import LLMModelConfig, LLMModelsConfig
     
     models_config = LLMModelsConfig()
     
@@ -103,8 +103,8 @@ def clean_environment():
     # Store original environment
     original_env = os.environ.copy()
     
-    # Clear Revo-specific environment variables
-    revo_vars = [key for key in os.environ.keys() if key.startswith('REVO_')]
+    # Clear Revos-specific environment variables
+    revo_vars = [key for key in os.environ.keys() if key.startswith('REVOS_')]
     for var in revo_vars:
         del os.environ[var]
     
@@ -118,7 +118,7 @@ def clean_environment():
 @pytest.fixture
 def mock_chat_openai():
     """Mock ChatOpenAI for testing."""
-    with patch('revo.llm.tools.ChatOpenAI') as mock_chat:
+    with patch('revos.llm.tools.ChatOpenAI') as mock_chat:
         mock_llm = Mock()
         mock_chat.return_value = mock_llm
         yield mock_chat, mock_llm
@@ -139,24 +139,24 @@ def mock_httpx():
 
 
 @pytest.fixture
-def mock_get_revo_token():
-    """Mock get_revo_token for testing."""
-    with patch('revo.auth.tokens.get_revo_token') as mock_token:
+def mock_get_revos_token():
+    """Mock get_revos_token for testing."""
+    with patch('revos.auth.tokens.get_revos_token') as mock_token:
         mock_token.return_value = "test-token"
         yield mock_token
 
 
 @pytest.fixture
-def mock_invalidate_revo_token():
-    """Mock invalidate_revo_token for testing."""
-    with patch('revo.auth.tokens.invalidate_revo_token') as mock_invalidate:
+def mock_invalidate_revos_token():
+    """Mock invalidate_revos_token for testing."""
+    with patch('revos.auth.tokens.invalidate_revos_token') as mock_invalidate:
         yield mock_invalidate
 
 
 @pytest.fixture
 def mock_get_settings():
     """Mock get_settings for testing."""
-    with patch('revo.config.main.get_settings') as mock_settings:
+    with patch('revos.config.main.get_settings') as mock_settings:
         yield mock_settings
 
 

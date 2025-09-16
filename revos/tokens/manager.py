@@ -2,7 +2,7 @@
 Token Management and Refresh Service
 
 This module provides the main interface for token management in the
-Revo library. It combines refresh logic and background services
+Revos library. It combines refresh logic and background services
 for comprehensive token lifecycle management.
 
 For detailed implementation, see:
@@ -16,7 +16,7 @@ from typing import Optional
 
 from .refresh import TokenRefreshManager
 from .background import BackgroundTokenManager
-from ..auth.exceptions import RevoTokenError
+from ..auth.exceptions import RevosTokenError
 
 # Re-export for backward compatibility
 TokenRefreshManager = TokenRefreshManager
@@ -73,9 +73,32 @@ class TokenManager:
         Start the background token refresh service.
 
         Raises:
-            RevoTokenError: If background service fails to start
+            RevosTokenError: If background service fails to start
         """
         await self.background_manager.start_background_refresh()
+    
+    async def start_background_service(self) -> None:
+        """
+        Start the background token refresh service.
+        Alias for start_background_refresh for backward compatibility.
+        """
+        await self.start_background_refresh()
+    
+    async def stop_background_service(self) -> None:
+        """
+        Stop the background token refresh service.
+        Alias for stop_background_refresh for backward compatibility.
+        """
+        await self.background_manager.stop_background_refresh()
+    
+    def is_background_service_running(self) -> bool:
+        """
+        Check if the background service is currently running.
+        
+        Returns:
+            bool: True if background service is running, False otherwise
+        """
+        return self.background_manager.is_running()
 
     async def stop_background_refresh(self) -> None:
         """

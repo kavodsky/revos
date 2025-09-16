@@ -1,7 +1,7 @@
 """
 LLM Interaction Module
 
-This module provides LLM interaction functionality for the Revo library,
+This module provides LLM interaction functionality for the Revos library,
 including LangChain-based tools for structured data extraction.
 """
 
