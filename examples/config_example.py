@@ -43,7 +43,7 @@ def example_environment_variables():
     # Load configuration
     config = get_settings()
     
-    print(f"✓ Revos Client ID: {config.revo.client_id}")
+    print(f"✓ Revos Client ID: {config.revos.client_id}")
     print(f"✓ LLM Model: {config.llm.model}")
     print(f"✓ Log Level: {config.logging.level}")
     print(f"✓ Refresh Interval: {config.token_manager.refresh_interval_minutes} minutes")
@@ -89,7 +89,7 @@ def example_programmatic_configuration():
         debug=True
     )
     
-    print(f"✓ Revos URL: {config.revo.token_url}")
+    print(f"✓ Revos URL: {config.revos.token_url}")
     print(f"✓ LLM Model: {config.llm.model}")
     print(f"✓ Temperature: {config.llm.temperature}")
     print(f"✓ Max Tokens: {config.llm.max_tokens}")
@@ -145,8 +145,8 @@ debug: false
         # Load configuration from YAML file
         config = load_config_from_file(yaml_file)
         
-        print(f"✓ Revos Client ID: {config.revo.client_id}")
-        print(f"✓ Token Buffer: {config.revo.token_buffer_minutes} minutes")
+        print(f"✓ Revos Client ID: {config.revos.client_id}")
+        print(f"✓ Token Buffer: {config.revos.token_buffer_minutes} minutes")
         print(f"✓ LLM Model: {config.llm.model}")
         print(f"✓ Log Level: {config.logging.level}")
         print(f"✓ Debug Mode: {config.debug}")
@@ -206,8 +206,8 @@ def example_json_configuration():
         # Load configuration from JSON file
         config = load_config_from_file(json_file)
         
-        print(f"✓ Revos Client ID: {config.revo.client_id}")
-        print(f"✓ Request Timeout: {config.revo.request_timeout} seconds")
+        print(f"✓ Revos Client ID: {config.revos.client_id}")
+        print(f"✓ Request Timeout: {config.revos.request_timeout} seconds")
         print(f"✓ LLM Temperature: {config.llm.temperature}")
         print(f"✓ Max Tokens: {config.llm.max_tokens}")
         print(f"✓ Periodic Refresh: {config.token_manager.enable_periodic_refresh}")
@@ -266,8 +266,8 @@ DEBUG=false
         # Load configuration from .env file
         config = RevosMainConfig(_env_file=env_file)
         
-        print(f"✓ Revos Client ID: {config.revo.client_id}")
-        print(f"✓ Token Buffer: {config.revo.token_buffer_minutes} minutes")
+        print(f"✓ Revos Client ID: {config.revos.client_id}")
+        print(f"✓ Token Buffer: {config.revos.token_buffer_minutes} minutes")
         print(f"✓ LLM Model: {config.llm.model}")
         print(f"✓ Temperature: {config.llm.temperature}")
         print(f"✓ Log File: {config.logging.file}")
@@ -306,7 +306,7 @@ def example_save_configuration():
         
         # Verify by loading it back
         loaded_config = load_config_from_file(yaml_file)
-        print(f"✓ Loaded Revos Client ID: {loaded_config.revo.client_id}")
+        print(f"✓ Loaded Revos Client ID: {loaded_config.revos.client_id}")
         print(f"✓ Loaded LLM Model: {loaded_config.llm.model}")
         print(f"✓ Loaded Debug Mode: {loaded_config.debug}")
         
@@ -336,7 +336,7 @@ def example_environment_variables_export():
     
     # Show configuration summary
     print("Configuration summary:")
-    print(f"  Revos API URL: {config.revo.base_url}")
+    print(f"  Revos API URL: {config.revos.base_url}")
     print(f"  LLM Model: {config.llm.model}")
     print(f"  Log Level: {config.logging.level}")
     print(f"  Debug Mode: {config.debug}")

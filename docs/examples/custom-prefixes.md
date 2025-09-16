@@ -39,7 +39,7 @@ config = create_config_with_prefixes(
     token_prefix="RUMBA_TOKEN_"  # Use RUMBA_TOKEN_ prefix for token management
 )
 
-print(f"Client ID: {config.revo.client_id}")
+print(f"Client ID: {config.revos.client_id}")
 print(f"LLM Model: {config.llm.model}")
 print(f"Temperature: {config.llm.temperature}")
 ```
@@ -81,9 +81,9 @@ def main():
     )
     
     print("✅ Configuration created with RUMBA_ prefix")
-    print(f"📊 Client ID: {config.revo.client_id}")
-    print(f"🔗 Token URL: {config.revo.token_url}")
-    print(f"🌐 Base URL: {config.revo.base_url}")
+    print(f"📊 Client ID: {config.revos.client_id}")
+    print(f"🔗 Token URL: {config.revos.token_url}")
+    print(f"🌐 Base URL: {config.revos.base_url}")
     print(f"🤖 LLM Model: {config.llm.model}")
     print(f"🌡️  Temperature: {config.llm.temperature}")
     print(f"📝 Max Tokens: {config.llm.max_tokens}")
@@ -115,8 +115,8 @@ prod_config = create_config_with_prefixes(
     token_prefix="RUMBA_PROD_TOKEN_"
 )
 
-print(f"Development Client ID: {dev_config.revo.client_id}")
-print(f"Production Client ID: {prod_config.revo.client_id}")
+print(f"Development Client ID: {dev_config.revos.client_id}")
+print(f"Production Client ID: {prod_config.revos.client_id}")
 ```
 
 ## Multiple Models with Custom Prefix

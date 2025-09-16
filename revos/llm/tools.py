@@ -12,6 +12,7 @@ from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
 
 from ..auth.tokens import get_revos_token, invalidate_revos_token
+from ..auth.core import RevosTokenManager
 from ..config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -30,13 +31,17 @@ class LangChainExtractor:
         self.model_name = model_name
         self.name = name or f"extractor_{model_name}"
         self.llm = None
+        
+        # Create a token manager with the custom settings
+        self.token_manager = RevosTokenManager(settings_instance=self.settings)
+        
         self._initialize_llm()
     
     def _initialize_llm(self):
         """Initialize the LLM client."""
         try:
-            # Get token from Revos
-            token = get_revos_token()
+            # Get token from Revos using custom token manager
+            token = self.token_manager.get_token()
             
             # Get LLM configuration
             if self.model_name and hasattr(self.settings, 'llm_models'):
@@ -46,7 +51,7 @@ class LangChainExtractor:
                 # Use default single LLM configuration
                 llm_config = self.settings.llm
             
-            revo_config = self.settings.revo
+            revo_config = self.settings.revos
             
             self.llm = ChatOpenAI(
                 model=llm_config.model,
@@ -70,11 +75,11 @@ class LangChainExtractor:
         logger.info(f"Refreshing LLM with new token (fallback={use_fallback})...")
         
         try:
-            invalidate_revos_token()
-            token = get_revos_token(force_refresh=True, use_fallback=use_fallback)
+            self.token_manager.invalidate_token()
+            token = self.token_manager.get_token(force_refresh=True, use_fallback=use_fallback)
             
             llm_config = self.settings.llm
-            revo_config = self.settings.revo
+            revo_config = self.settings.revos
             
             self.llm = ChatOpenAI(
                 model=llm_config.model,

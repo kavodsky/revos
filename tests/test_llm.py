@@ -28,9 +28,9 @@ class TestLangChainExtractor:
     def setup_method(self):
         """Set up test fixtures."""
         self.settings_mock = Mock()
-        self.settings_mock.revo.client_id = "test-client-id"
-        self.settings_mock.revo.client_secret = "test-client-secret"
-        self.settings_mock.revo.base_url = "https://test.com/api"
+        self.settings_mock.revos.client_id = "test-client-id"
+        self.settings_mock.revos.client_secret = "test-client-secret"
+        self.settings_mock.revos.base_url = "https://test.com/api"
         self.settings_mock.llm.model = "gpt-3.5-turbo"
         self.settings_mock.llm.temperature = 0.1
         self.settings_mock.llm.max_tokens = 1000

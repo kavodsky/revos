@@ -88,7 +88,7 @@ def create_config_with_prefixes(
     
     # Create the main config with custom nested configs
     class CustomRevosMainConfig(RevosMainConfig):
-        revo: CustomRevosConfig = Field(default_factory=CustomRevosConfig)
+        revos: CustomRevosConfig = Field(default_factory=CustomRevosConfig)
         llm: CustomLLMConfig = Field(default_factory=CustomLLMConfig)
         logging: CustomLoggingConfig = Field(default_factory=CustomLoggingConfig)
         token_manager: CustomTokenManagerConfig = Field(default_factory=CustomTokenManagerConfig)
@@ -99,8 +99,8 @@ def create_config_with_prefixes(
             
             # If _env_file is provided, pass it to nested configurations
             if env_file:
-                if 'revo' not in kwargs:
-                    kwargs['revo'] = CustomRevosConfig(_env_file=env_file)
+                if 'revos' not in kwargs:
+                    kwargs['revos'] = CustomRevosConfig(_env_file=env_file)
                 if 'llm' not in kwargs:
                     kwargs['llm'] = CustomLLMConfig(_env_file=env_file)
                 if 'logging' not in kwargs:
@@ -124,7 +124,7 @@ def create_minimal_config(**kwargs) -> RevosMainConfig:
         RevosMainConfig instance with minimal settings
     """
     return RevosMainConfig(
-        revo=RevosConfig(
+        revos=RevosConfig(
             client_id=kwargs.get('client_id', ''),
             client_secret=kwargs.get('client_secret', ''),
             token_url=kwargs.get('token_url', 'https://your-site.com/revo/oauth/token'),
@@ -152,7 +152,7 @@ def create_development_config(**kwargs) -> RevosMainConfig:
         RevosMainConfig instance with development-optimized settings
     """
     return RevosMainConfig(
-        revo=RevosConfig(
+        revos=RevosConfig(
             client_id=kwargs.get('client_id', 'dev-client-id'),
             client_secret=kwargs.get('client_secret', 'dev-client-secret'),
             token_url=kwargs.get('token_url', 'https://dev-api.example.com/oauth/token'),
@@ -191,7 +191,7 @@ def create_production_config(**kwargs) -> RevosMainConfig:
         RevosMainConfig instance with production-optimized settings
     """
     return RevosMainConfig(
-        revo=RevosConfig(
+        revos=RevosConfig(
             client_id=kwargs.get('client_id', ''),
             client_secret=kwargs.get('client_secret', ''),
             token_url=kwargs.get('token_url', 'https://api.example.com/oauth/token'),

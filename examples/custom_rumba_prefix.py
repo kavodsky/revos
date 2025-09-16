@@ -60,7 +60,7 @@ def example_basic_custom_prefix():
     )
     
     print(f"✅ Configuration created with RUMBA_ prefix")
-    print(f"📊 Client ID: {config.revo.client_id}")
+    print(f"📊 Client ID: {config.revos.client_id}")
     print(f"🤖 LLM Model: {config.llm.model}")
     print(f"🔄 Refresh Interval: {config.token_manager.refresh_interval_minutes} minutes")
     print(f"📝 Logging Level: {config.logging.level}")

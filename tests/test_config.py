@@ -247,8 +247,8 @@ class TestRevosMainConfig:
         }):
             config = RevosMainConfig()
             
-            assert config.revo.client_id == "test-client-id"
-            assert config.revo.client_secret == "test-client-secret"
+            assert config.revos.client_id == "test-client-id"
+            assert config.revos.client_secret == "test-client-secret"
             assert isinstance(config.llm, LLMConfig)
             assert isinstance(config.llm_models, LLMModelsConfig)
             assert isinstance(config.logging, LoggingConfig)
@@ -267,8 +267,8 @@ class TestRevosMainConfig:
             }
         )
         
-        assert config.revo.client_id == "custom-client-id"
-        assert config.revo.client_secret == "custom-client-secret"
+        assert config.revos.client_id == "custom-client-id"
+        assert config.revos.client_secret == "custom-client-secret"
         assert config.llm.model == "gpt-4"
         assert config.llm.temperature == 0.8
 
@@ -298,8 +298,8 @@ class TestConfigFactory:
         )
         
         assert isinstance(config, RevosMainConfig)
-        assert config.revo.client_id == "minimal-client-id"
-        assert config.revo.client_secret == "minimal-client-secret"
+        assert config.revos.client_id == "minimal-client-id"
+        assert config.revos.client_secret == "minimal-client-secret"
     
     def test_create_development_config(self):
         """Test create_development_config function."""
@@ -309,8 +309,8 @@ class TestConfigFactory:
         )
         
         assert isinstance(config, RevosMainConfig)
-        assert config.revo.client_id == "dev-client-id"
-        assert config.revo.client_secret == "dev-client-secret"
+        assert config.revos.client_id == "dev-client-id"
+        assert config.revos.client_secret == "dev-client-secret"
         assert config.logging.level == "DEBUG"
     
     def test_create_production_config(self):
@@ -321,8 +321,8 @@ class TestConfigFactory:
         )
         
         assert isinstance(config, RevosMainConfig)
-        assert config.revo.client_id == "prod-client-id"
-        assert config.revo.client_secret == "prod-client-secret"
+        assert config.revos.client_id == "prod-client-id"
+        assert config.revos.client_secret == "prod-client-secret"
         assert config.logging.level == "WARNING"
 
 
@@ -349,8 +349,8 @@ class TestConfigFileLoading:
         try:
             config = RevosMainConfig.from_file(temp_file)
             
-            assert config.revo.client_id == "yaml-client-id"
-            assert config.revo.client_secret == "yaml-client-secret"
+            assert config.revos.client_id == "yaml-client-id"
+            assert config.revos.client_secret == "yaml-client-secret"
             assert config.llm.model == "gpt-4"
             assert config.llm.temperature == 0.8
         finally:
@@ -376,8 +376,8 @@ class TestConfigFileLoading:
         try:
             config = RevosMainConfig.from_file(temp_file)
             
-            assert config.revo.client_id == "json-client-id"
-            assert config.revo.client_secret == "json-client-secret"
+            assert config.revos.client_id == "json-client-id"
+            assert config.revos.client_secret == "json-client-secret"
             assert config.llm.model == "gpt-4"
             assert config.llm.temperature == 0.8
         finally:
@@ -400,8 +400,8 @@ class TestConfigFileLoading:
             config = load_config_from_file(temp_file)
             
             assert isinstance(config, RevosMainConfig)
-            assert config.revo.client_id == "function-client-id"
-            assert config.revo.client_secret == "function-client-secret"
+            assert config.revos.client_id == "function-client-id"
+            assert config.revos.client_secret == "function-client-secret"
         finally:
             os.unlink(temp_file)
 
@@ -423,8 +423,8 @@ class TestSettings:
             settings = get_settings()
             
             assert isinstance(settings, RevosMainConfig)
-            assert settings.revo.client_id == "settings-client-id"
-            assert settings.revo.client_secret == "settings-client-secret"
+            assert settings.revos.client_id == "settings-client-id"
+            assert settings.revos.client_secret == "settings-client-secret"
     
     def test_get_settings_singleton(self):
         """Test that get_settings returns the same instance."""

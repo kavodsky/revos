@@ -60,8 +60,8 @@ def example_custom_prefixes():
     )
     
     print("✓ RUMBA_ prefix configuration created")
-    print(f"  🎵 RUMBA Client ID: {rumba_config.revo.client_id}")
-    print(f"  🎵 RUMBA Base URL: {rumba_config.revo.base_url}")
+    print(f"  🎵 RUMBA Client ID: {rumba_config.revos.client_id}")
+    print(f"  🎵 RUMBA Base URL: {rumba_config.revos.base_url}")
     print(f"  🤖 RUMBA LLM Model: {rumba_config.llm.model}")
     print(f"  🌡️  RUMBA Temperature: {rumba_config.llm.temperature}")
     print()
@@ -78,8 +78,8 @@ def example_custom_prefixes():
     )
     
     print("✓ Configuration created with custom prefixes")
-    print(f"  🔧 API Client ID: {config.revo.client_id}")
-    print(f"  🔧 API Base URL: {config.revo.base_url}")
+    print(f"  🔧 API Client ID: {config.revos.client_id}")
+    print(f"  🔧 API Base URL: {config.revos.base_url}")
     print(f"  🤖 LLM Model: {config.llm.model}")
     print(f"  🌡️  LLM Temperature: {config.llm.temperature}")
     print(f"  📝 Log Level: {config.logging.level}")
@@ -118,7 +118,7 @@ def example_mixed_prefixes():
     )
     
     print("✓ Configuration created with mixed prefixes")
-    print(f"  Revos Client ID: {config.revo.client_id}")
+    print(f"  Revos Client ID: {config.revos.client_id}")
     print(f"  LLM Model: {config.llm.model}")
     print(f"  LLM Temperature: {config.llm.temperature}")
     print(f"  Log Level: {config.logging.level}")
@@ -150,7 +150,7 @@ def example_minimal_prefixes():
     )
     
     print("✓ Configuration created with minimal prefixes")
-    print(f"  API Client ID: {config.revo.client_id}")
+    print(f"  API Client ID: {config.revos.client_id}")
     print(f"  Model: {config.llm.model}")
     print(f"  Temperature: {config.llm.temperature}")
     print(f"  Log Level: {config.logging.level}")
@@ -186,8 +186,8 @@ def example_enterprise_prefixes():
     )
     
     print("✓ Configuration created with enterprise-style prefixes")
-    print(f"  Company Revos Client ID: {config.revo.client_id}")
-    print(f"  Company Revos Base URL: {config.revo.base_url}")
+    print(f"  Company Revos Client ID: {config.revos.client_id}")
+    print(f"  Company Revos Base URL: {config.revos.base_url}")
     print(f"  Company LLM Model: {config.llm.model}")
     print(f"  Company LLM Temperature: {config.llm.temperature}")
     print(f"  Company Log Level: {config.logging.level}")

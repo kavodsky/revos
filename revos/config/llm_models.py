@@ -102,6 +102,12 @@ class LLMModelsConfig(BaseSettings):
                 temperature=0.1,
                 max_tokens=2000,
                 description="Anthropic's Claude 3 model"
+            ),
+            "claude_4_sonnet": LLMModelConfig(
+                model="claude-4-sonnet",
+                temperature=0.1,
+                max_tokens=2000,
+                description="Anthropic's Claude 4 Sonnet model"
             )
         },
         description="Dictionary of available LLM models"

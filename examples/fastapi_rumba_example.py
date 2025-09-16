@@ -68,9 +68,9 @@ class RumbaConfig:
         )
         
         print("🎵 RUMBA_ prefix configuration loaded successfully")
-        print(f"📊 Client ID: {self.revos_config.revo.client_id}")
-        print(f"🔗 Token URL: {self.revos_config.revo.token_url}")
-        print(f"🌐 Base URL: {self.revos_config.revo.base_url}")
+        print(f"📊 Client ID: {self.revos_config.revos.client_id}")
+        print(f"🔗 Token URL: {self.revos_config.revos.token_url}")
+        print(f"🌐 Base URL: {self.revos_config.revos.base_url}")
         print(f"🤖 LLM Model: {self.revos_config.llm.model}")
         print(f"🌡️  Temperature: {self.revos_config.llm.temperature}")
         print(f"📝 Max Tokens: {self.revos_config.llm.max_tokens}")
@@ -248,9 +248,9 @@ async def get_rumba_config_info(config: RumbaConfig = Depends(get_rumba_config))
     """Get RUMBA configuration information."""
     return {
         "prefix": "RUMBA_",
-        "client_id": config.revos_config.revo.client_id,
-        "token_url": config.revos_config.revo.token_url,
-        "base_url": config.revos_config.revo.base_url,
+        "client_id": config.revos_config.revos.client_id,
+        "token_url": config.revos_config.revos.token_url,
+        "base_url": config.revos_config.revos.base_url,
         "llm_model": config.revos_config.llm.model,
         "llm_temperature": config.revos_config.llm.temperature,
         "llm_max_tokens": config.revos_config.llm.max_tokens,

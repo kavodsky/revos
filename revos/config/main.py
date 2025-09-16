@@ -30,7 +30,7 @@ class RevosMainConfig(BaseSettings):
     )
     
     # Nested configuration sections
-    revo: RevosConfig = Field(default_factory=RevosConfig)
+    revos: RevosConfig = Field(default_factory=RevosConfig)
     llm: LLMConfig = Field(default_factory=LLMConfig)
     llm_models: LLMModelsConfig = Field(default_factory=LLMModelsConfig)
     logging: LoggingConfig = Field(default_factory=LoggingConfig)
@@ -43,8 +43,8 @@ class RevosMainConfig(BaseSettings):
         # If _env_file is provided, pass it to nested configurations
         if env_file:
             # Create nested configs with the same env file
-            if 'revo' not in kwargs:
-                kwargs['revo'] = RevosConfig(_env_file=env_file)
+            if 'revos' not in kwargs:
+                kwargs['revos'] = RevosConfig(_env_file=env_file)
             if 'llm' not in kwargs:
                 kwargs['llm'] = LLMConfig(_env_file=env_file)
             if 'llm_models' not in kwargs:

@@ -77,11 +77,11 @@ async def main():
     
     # Get current settings
     settings = get_settings()
-    print(f"✓ Revos Token URL: {settings.revo.token_url}")
-    print(f"✓ Revos Base URL: {settings.revo.base_url}")
+    print(f"✓ Revos Token URL: {settings.revos.token_url}")
+    print(f"✓ Revos Base URL: {settings.revos.base_url}")
     print(f"✓ LLM Model: {settings.llm.model}")
     print(f"✓ LLM Temperature: {settings.llm.temperature}")
-    print(f"✓ Token Buffer Minutes: {settings.revo.token_buffer_minutes}")
+    print(f"✓ Token Buffer Minutes: {settings.revos.token_buffer_minutes}")
     print(f"✓ Refresh Interval: {settings.token_manager.refresh_interval_minutes} minutes")
     print(f"✓ Log Level: {settings.logging.level}")
     
@@ -103,14 +103,14 @@ async def main():
         debug=True
     )
     
-    print(f"✓ Custom Revos URL: {custom_config.revo.token_url}")
+    print(f"✓ Custom Revos URL: {custom_config.revos.token_url}")
     print(f"✓ Custom LLM Model: {custom_config.llm.model}")
     print(f"✓ Debug Mode: {custom_config.debug}")
     
     # Show configuration summary
     print("\n4. Configuration Summary")
     print("-" * 25)
-    print(f"  Revos API URL: {custom_config.revo.base_url}")
+    print(f"  Revos API URL: {custom_config.revos.base_url}")
     print(f"  LLM Model: {custom_config.llm.model}")
     print(f"  Log Level: {custom_config.logging.level}")
     print(f"  Debug Mode: {custom_config.debug}")
