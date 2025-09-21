@@ -43,8 +43,6 @@ class RevosMainConfig(BaseSettings):
             # Create nested configs with the same env file
             if 'revos' not in kwargs:
                 kwargs['revos'] = RevosConfig(_env_file=env_file)
-            if 'llm' not in kwargs:
-                kwargs['llm'] = LLMConfig(_env_file=env_file)
             if 'llm_models' not in kwargs:
                 kwargs['llm_models'] = LLMModelsConfig(_env_file=env_file)
             if 'logging' not in kwargs:

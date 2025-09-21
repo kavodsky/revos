@@ -24,6 +24,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Async test configuration issues
 - Mock configuration in test suite
 
+## [0.1.6] - 2024-12-19
+
+### Added
+- **Enhanced TokenManager Environment Variable Support**: Full support for loading custom environment variables from `.env` files
+- **Flexible Prefix Support**: Support for any custom prefix (TOKEN_, AUTH_, CUSTOM_, etc.) for token management configuration
+- **Comprehensive Test Suite**: Added 7 new test cases specifically for TokenManager environment variable loading
+- **Type Conversion**: Smart conversion of string environment variables to appropriate Python types (booleans, integers)
+- **Configuration Validation**: Enhanced validation for all TokenManager configuration fields with proper range checking
+
+### Changed
+- **TokenManager Configuration**: Enhanced default values and field constraints for all settings
+- **Configuration Factory**: Improved `create_config_with_prefixes()` function to support custom token management prefixes
+- **Environment File Loading**: Better handling of custom `.env` files with proper encoding and error handling
+- **Error Messages**: More descriptive error messages for configuration issues
+
+### Fixed
+- **Configuration Loading Issues**: Fixed environment variables not being properly loaded from `.env` files
+- **Missing Import**: Fixed missing `LLMConfig` import in `RevosMainConfig`
+- **Prefix Conflicts**: Resolved conflicts between different configuration prefixes
+- **Type Conversion**: Fixed string-to-type conversion issues for boolean and numeric values
+- **Environment File Handling**: Improved handling of environment files in main configuration
+
+### Technical Details
+- **Test Coverage**: 58 token-related tests passing with comprehensive coverage
+- **Environment Variables**: Support for TOKEN_, AUTH_, CUSTOM_TOKEN_, and any custom prefix
+- **Validation**: Proper min/max constraints for numeric fields and boolean parsing
+- **Integration**: Seamless integration with RevosMainConfig system
+
 ## [1.0.0] - 2024-01-15
 
 ### Added
