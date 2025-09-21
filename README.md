@@ -6,13 +6,14 @@ A Python library for Revos API authentication and LangChain-based LLM tools with
 
 - **🔐 Revos API Authentication**: Dual authentication methods with automatic fallback
 - **🤖 LangChain Integration**: Structured data extraction using LLMs
-- **⚙️ Multiple LLM Models**: Support for multiple models with different configurations
+- **⚙️ Multiple LLM Models**: Support for multiple models with different configurations via environment variables
 - **🔄 Token Management**: Automatic token refresh with configurable intervals
 - **🛡️ Robust Error Handling**: Comprehensive retry logic and fallback mechanisms
 - **🔧 Flexible Configuration**: Environment variables, YAML, JSON, and programmatic configuration
 - **📊 OpenAI-Compatible**: Works with OpenAI-compatible APIs through Revos
 - **🧪 Comprehensive Testing**: Full test suite with pytest
 - **📚 Rich Examples**: Multiple usage examples and configuration patterns
+- **🌍 Custom Prefixes**: Support for custom environment variable prefixes to avoid conflicts
 
 ## Installation
 
@@ -34,7 +35,18 @@ pip install -e ".[dev]"
 
 ## Configuration
 
-The Revos library uses `pydantic_settings` for robust configuration management. You can configure the library in several ways:
+The Revos library uses `pydantic_settings` for robust configuration management. The library now exclusively supports **multiple LLM models configuration** through environment variables, providing maximum flexibility and avoiding conflicts with other applications.
+
+### Multiple Models Configuration
+
+The library supports configuring multiple LLM models through environment variables with the `LLM_MODELS_` prefix. This approach allows you to:
+
+- **Configure multiple models** with different settings
+- **Use custom prefixes** to avoid conflicts with other applications
+- **Override default models** with your own configurations
+- **Support different environments** (dev, staging, production) with different model sets
+
+You can configure the library in several ways:
 
 ### 1. Environment Variables
 
@@ -52,13 +64,21 @@ export REVOS_TOKEN_BUFFER_MINUTES="5"
 export REVOS_MAX_RETRIES="3"
 export REVOS_REQUEST_TIMEOUT="30"
 
-# LLM settings
-export LLM_MODEL="gpt-3.5-turbo"
-export LLM_TEMPERATURE="0.1"
-export LLM_MAX_TOKENS="1024"
-export LLM_TOP_P="1.0"
-export LLM_FREQUENCY_PENALTY="0.0"
-export LLM_PRESENCE_PENALTY="0.0"
+# Multiple LLM Models Configuration
+export LLM_MODELS_GPT_3_5_TURBO_MODEL="gpt-3.5-turbo"
+export LLM_MODELS_GPT_3_5_TURBO_TEMPERATURE="0.1"
+export LLM_MODELS_GPT_3_5_TURBO_MAX_TOKENS="1024"
+export LLM_MODELS_GPT_3_5_TURBO_DESCRIPTION="Fast and cost-effective model for general tasks"
+
+export LLM_MODELS_GPT_4_MODEL="gpt-4"
+export LLM_MODELS_GPT_4_TEMPERATURE="0.1"
+export LLM_MODELS_GPT_4_MAX_TOKENS="2000"
+export LLM_MODELS_GPT_4_DESCRIPTION="Most capable model for complex tasks"
+
+export LLM_MODELS_CLAUDE_4_SONNET_MODEL="claude_4_sonnet"
+export LLM_MODELS_CLAUDE_4_SONNET_TEMPERATURE="0.3"
+export LLM_MODELS_CLAUDE_4_SONNET_MAX_TOKENS="4000"
+export LLM_MODELS_CLAUDE_4_SONNET_DESCRIPTION="Anthropic's Claude 4 Sonnet model"
 
 # Logging settings
 export LOG_LEVEL="INFO"
@@ -82,7 +102,7 @@ export DEBUG="false"
 Create a `config.yaml` file:
 
 ```yaml
-revo:
+revos:
   client_id: "your_client_id"
   client_secret: "your_client_secret"
   token_url: "https://your-site.com/revo/oauth/token"
@@ -91,13 +111,32 @@ revo:
   max_retries: 3
   request_timeout: 30
 
-llm:
-  model: "gpt-3.5-turbo"
-  temperature: 0.1
-  max_tokens: 1024
-  top_p: 1.0
-  frequency_penalty: 0.0
-  presence_penalty: 0.0
+llm_models:
+  models:
+    gpt-3.5-turbo:
+      model: "gpt-3.5-turbo"
+      temperature: 0.1
+      max_tokens: 1024
+      top_p: 1.0
+      frequency_penalty: 0.0
+      presence_penalty: 0.0
+      description: "Fast and cost-effective model for general tasks"
+    gpt-4:
+      model: "gpt-4"
+      temperature: 0.1
+      max_tokens: 2000
+      top_p: 1.0
+      frequency_penalty: 0.0
+      presence_penalty: 0.0
+      description: "Most capable model for complex tasks"
+    claude_4_sonnet:
+      model: "claude_4_sonnet"
+      temperature: 0.3
+      max_tokens: 4000
+      top_p: 0.95
+      frequency_penalty: 0.0
+      presence_penalty: 0.0
+      description: "Anthropic's Claude 4 Sonnet model"
 
 logging:
   level: "INFO"
@@ -121,7 +160,7 @@ Create a `config.json` file:
 
 ```json
 {
-  "revo": {
+  "revos": {
     "client_id": "your_client_id",
     "client_secret": "your_client_secret",
     "token_url": "https://your-site.com/revo/oauth/token",
@@ -130,13 +169,36 @@ Create a `config.json` file:
     "max_retries": 3,
     "request_timeout": 30
   },
-  "llm": {
-    "model": "gpt-3.5-turbo",
-    "temperature": 0.1,
-    "max_tokens": 1024,
-    "top_p": 1.0,
-    "frequency_penalty": 0.0,
-    "presence_penalty": 0.0
+  "llm_models": {
+    "models": {
+      "gpt-3.5-turbo": {
+        "model": "gpt-3.5-turbo",
+        "temperature": 0.1,
+        "max_tokens": 1024,
+        "top_p": 1.0,
+        "frequency_penalty": 0.0,
+        "presence_penalty": 0.0,
+        "description": "Fast and cost-effective model for general tasks"
+      },
+      "gpt-4": {
+        "model": "gpt-4",
+        "temperature": 0.1,
+        "max_tokens": 2000,
+        "top_p": 1.0,
+        "frequency_penalty": 0.0,
+        "presence_penalty": 0.0,
+        "description": "Most capable model for complex tasks"
+      },
+      "claude_4_sonnet": {
+        "model": "claude_4_sonnet",
+        "temperature": 0.3,
+        "max_tokens": 4000,
+        "top_p": 0.95,
+        "frequency_penalty": 0.0,
+        "presence_penalty": 0.0,
+        "description": "Anthropic's Claude 4 Sonnet model"
+      }
+    }
   },
   "logging": {
     "level": "INFO",
@@ -164,8 +226,23 @@ REVOS_CLIENT_ID=your_client_id
 REVOS_CLIENT_SECRET=your_client_secret
 REVOS_TOKEN_URL=https://your-site.com/revo/oauth/token
 REVOS_BASE_URL=https://your-site.com/revo/llm-api
-LLM_MODEL=gpt-3.5-turbo
-LLM_TEMPERATURE=0.1
+
+# Multiple LLM Models Configuration
+LLM_MODELS_GPT_3_5_TURBO_MODEL=gpt-3.5-turbo
+LLM_MODELS_GPT_3_5_TURBO_TEMPERATURE=0.1
+LLM_MODELS_GPT_3_5_TURBO_MAX_TOKENS=1024
+LLM_MODELS_GPT_3_5_TURBO_DESCRIPTION="Fast and cost-effective model for general tasks"
+
+LLM_MODELS_GPT_4_MODEL=gpt-4
+LLM_MODELS_GPT_4_TEMPERATURE=0.1
+LLM_MODELS_GPT_4_MAX_TOKENS=2000
+LLM_MODELS_GPT_4_DESCRIPTION="Most capable model for complex tasks"
+
+LLM_MODELS_CLAUDE_4_SONNET_MODEL=claude_4_sonnet
+LLM_MODELS_CLAUDE_4_SONNET_TEMPERATURE=0.3
+LLM_MODELS_CLAUDE_4_SONNET_MAX_TOKENS=4000
+LLM_MODELS_CLAUDE_4_SONNET_DESCRIPTION="Anthropic's Claude 4 Sonnet model"
+
 LOG_LEVEL=INFO
 TOKEN_REFRESH_INTERVAL_MINUTES=45
 DEBUG=false
@@ -174,11 +251,11 @@ DEBUG=false
 ### 3. Programmatic Configuration
 
 ```python
-from revos import RevosMainConfig, RevosConfig, LLMConfig, LoggingConfig, TokenManagerConfig
+from revos import RevosMainConfig, RevosConfig, LLMModelConfig, LLMModelsConfig, LoggingConfig, TokenManagerConfig
 
-# Create custom configuration
+# Create custom configuration with multiple models
 config = RevosMainConfig(
-    revo=RevosConfig(
+    revos=RevosConfig(
         client_id="your_client_id",
         client_secret="your_client_secret",
         token_url="https://your-site.com/revo/oauth/token",
@@ -187,13 +264,36 @@ config = RevosMainConfig(
         max_retries=3,
         request_timeout=30
     ),
-    llm=LLMConfig(
-        model="gpt-3.5-turbo",
-        temperature=0.1,
-        max_tokens=1024,
-        top_p=1.0,
-        frequency_penalty=0.0,
-        presence_penalty=0.0
+    llm_models=LLMModelsConfig(
+        models={
+            "gpt-3.5-turbo": LLMModelConfig(
+                model="gpt-3.5-turbo",
+                temperature=0.1,
+                max_tokens=1024,
+                top_p=1.0,
+                frequency_penalty=0.0,
+                presence_penalty=0.0,
+                description="Fast and cost-effective model for general tasks"
+            ),
+            "gpt-4": LLMModelConfig(
+                model="gpt-4",
+                temperature=0.1,
+                max_tokens=2000,
+                top_p=1.0,
+                frequency_penalty=0.0,
+                presence_penalty=0.0,
+                description="Most capable model for complex tasks"
+            ),
+            "claude_4_sonnet": LLMModelConfig(
+                model="claude_4_sonnet",
+                temperature=0.3,
+                max_tokens=4000,
+                top_p=0.95,
+                frequency_penalty=0.0,
+                presence_penalty=0.0,
+                description="Anthropic's Claude 4 Sonnet model"
+            )
+        }
     ),
     logging=LoggingConfig(
         level="INFO",
@@ -212,10 +312,10 @@ config = RevosMainConfig(
 )
 
 # Use the configuration
-from revos import RevosTokenManager, LangChainExtractor
+from revos import RevosTokenManager, get_langchain_extractor
 
 token_manager = RevosTokenManager(settings_instance=config)
-extractor = LangChainExtractor(settings_instance=config)
+extractor = get_langchain_extractor("gpt-4", settings_instance=config)
 ```
 
 ### 4. Custom Environment Variable Prefixes
@@ -235,7 +335,7 @@ config = create_config_with_prefixes(
 
 # This will look for environment variables like:
 # MY_API_CLIENT_ID, MY_API_CLIENT_SECRET
-# AI_MODEL, AI_TEMPERATURE
+# AI_MODELS_GPT_4_MODEL, AI_MODELS_GPT_4_TEMPERATURE
 # APP_LOG_LEVEL, APP_LOG_FORMAT
 # AUTH_REFRESH_INTERVAL_MINUTES
 ```
@@ -251,8 +351,10 @@ config = create_config_with_prefixes(
 # Set custom environment variables
 export MY_API_CLIENT_ID="your-client-id"
 export MY_API_CLIENT_SECRET="your-client-secret"
-export AI_MODEL="gpt-4"
-export AI_TEMPERATURE="0.7"
+export AI_MODELS_GPT_4_MODEL="gpt-4"
+export AI_MODELS_GPT_4_TEMPERATURE="0.7"
+export AI_MODELS_CLAUDE_4_SONNET_MODEL="claude_4_sonnet"
+export AI_MODELS_CLAUDE_4_SONNET_TEMPERATURE="0.3"
 export APP_LOG_LEVEL="INFO"
 ```
 
@@ -274,7 +376,7 @@ token = token_manager.get_token()
 ### Structured Data Extraction
 
 ```python
-from revos import LangChainExtractor
+from revos import get_langchain_extractor
 from langchain_core.prompts import PromptTemplate
 from pydantic import BaseModel
 
@@ -293,8 +395,8 @@ Extract person information from the following text:
 """
 prompt = PromptTemplate(template=template, input_variables=["text"])
 
-# Extract structured data
-extractor = LangChainExtractor()
+# Extract structured data using a specific model
+extractor = get_langchain_extractor("gpt-4")
 result = await extractor.extract(
     target=PersonInfo,
     prompt=prompt,
@@ -350,10 +452,10 @@ print(f"Fresh token: {token[:20]}...")
 token_manager.invalidate_token()
 ```
 
-#### 2. Single Model Data Extraction
+#### 2. Multiple Models Data Extraction
 
 ```python
-from revos import get_langchain_extractor
+from revos import get_langchain_extractor, list_available_extractors
 from langchain_core.prompts import PromptTemplate
 from pydantic import BaseModel
 import asyncio
@@ -375,20 +477,30 @@ Extract person information from the following text:
 prompt = PromptTemplate(template=template, input_variables=["text"])
 
 async def extract_person_info():
-    # Get extractor for a specific model
-    extractor = get_langchain_extractor("gpt-3.5-turbo")
+    # List available models
+    available_models = list_available_extractors()
+    print(f"Available models: {list(available_models.keys())}")
     
-    # Extract structured data
-    result = await extractor.extract(
+    # Use different models for different tasks
+    text = "John is 30 years old and works as a software engineer in San Francisco."
+    
+    # Fast extraction with GPT-3.5
+    fast_extractor = get_langchain_extractor("gpt-3.5-turbo")
+    fast_result = await fast_extractor.extract(
         target=PersonInfo,
         prompt=prompt,
-        text="John is 30 years old and works as a software engineer in San Francisco."
+        text=text
     )
+    print(f"Fast extraction: {fast_result.name}, {fast_result.age}")
     
-    print(f"Name: {result.name}")
-    print(f"Age: {result.age}")
-    print(f"Occupation: {result.occupation}")
-    print(f"Location: {result.location}")
+    # Accurate extraction with GPT-4
+    accurate_extractor = get_langchain_extractor("gpt-4")
+    accurate_result = await accurate_extractor.extract(
+        target=PersonInfo,
+        prompt=prompt,
+        text=text
+    )
+    print(f"Accurate extraction: {accurate_result.name}, {accurate_result.age}")
 
 # Run the extraction
 asyncio.run(extract_person_info())
@@ -1223,8 +1335,8 @@ Main configuration class for the Revos library.
 - `create_config_with_prefixes()`: Create configuration with custom environment variable prefixes
 
 **Properties:**
-- `revo`: RevosConfig instance
-- `llm`: LLMConfig instance
+- `revos`: RevosConfig instance
+- `llm_models`: LLMModelsConfig instance
 - `logging`: LoggingConfig instance
 - `token_manager`: TokenManagerConfig instance
 - `debug`: Global debug flag
@@ -1242,9 +1354,20 @@ Revos API configuration settings.
 - `max_retries`: Maximum retry attempts for requests
 - `request_timeout`: Request timeout in seconds
 
-#### LLMConfig
+#### LLMModelsConfig
 
-LLM configuration settings.
+Multiple LLM models configuration settings.
+
+**Properties:**
+- `models`: Dictionary of model configurations
+- `get_model(model_name)`: Get configuration for a specific model
+- `list_available_models()`: List all available model names
+- `add_model(model_name, config)`: Add a new model configuration
+- `remove_model(model_name)`: Remove a model configuration
+
+#### LLMModelConfig
+
+Individual LLM model configuration settings.
 
 **Properties:**
 - `model`: LLM model name
@@ -1253,6 +1376,7 @@ LLM configuration settings.
 - `top_p`: Top-p sampling parameter
 - `frequency_penalty`: Frequency penalty
 - `presence_penalty`: Presence penalty
+- `description`: Human-readable description of the model
 
 #### LoggingConfig
 
@@ -1541,6 +1665,124 @@ MIT License - see LICENSE file for details.
 3. Make your changes
 4. Add tests
 5. Submit a pull request
+
+## Multiple Models Configuration
+
+The Revos library now exclusively supports multiple LLM models configuration through environment variables. This approach provides maximum flexibility and avoids conflicts with other applications.
+
+### Environment Variable Format
+
+The library uses the `LLM_MODELS_` prefix for all multiple models configuration:
+
+```bash
+# Format: LLM_MODELS_{MODEL_NAME}_{PARAMETER} = value
+LLM_MODELS_GPT_4_MODEL=gpt-4
+LLM_MODELS_GPT_4_TEMPERATURE=0.1
+LLM_MODELS_GPT_4_MAX_TOKENS=2000
+LLM_MODELS_GPT_4_DESCRIPTION="Most capable model for complex tasks"
+
+LLM_MODELS_CLAUDE_4_SONNET_MODEL=claude_4_sonnet
+LLM_MODELS_CLAUDE_4_SONNET_TEMPERATURE=0.3
+LLM_MODELS_CLAUDE_4_SONNET_MAX_TOKENS=4000
+LLM_MODELS_CLAUDE_4_SONNET_DESCRIPTION="Anthropic's Claude 4 Sonnet model"
+```
+
+### Supported Parameters
+
+- `MODEL`: The actual model name (e.g., "gpt-4", "claude_4_sonnet")
+- `TEMPERATURE`: Model temperature (0.0 to 2.0)
+- `MAX_TOKENS`: Maximum tokens to generate
+- `TOP_P`: Top-p sampling parameter (0.0 to 1.0)
+- `FREQUENCY_PENALTY`: Frequency penalty (-2.0 to 2.0)
+- `PRESENCE_PENALTY`: Presence penalty (-2.0 to 2.0)
+- `DESCRIPTION`: Human-readable description of the model
+- `CUSTOM_PARAMS`: JSON string with additional parameters
+
+### Example Configuration Files
+
+#### .env File Example
+
+```env
+# Revos API Configuration
+REVOS_CLIENT_ID=your_client_id
+REVOS_CLIENT_SECRET=your_client_secret
+REVOS_TOKEN_URL=https://your-site.com/revo/oauth/token
+REVOS_BASE_URL=https://your-site.com/revo/llm-api
+
+# Multiple LLM Models Configuration
+LLM_MODELS_GPT_3_5_TURBO_MODEL=gpt-3.5-turbo
+LLM_MODELS_GPT_3_5_TURBO_TEMPERATURE=0.1
+LLM_MODELS_GPT_3_5_TURBO_MAX_TOKENS=1024
+LLM_MODELS_GPT_3_5_TURBO_DESCRIPTION="Fast and cost-effective model for general tasks"
+
+LLM_MODELS_GPT_4_MODEL=gpt-4
+LLM_MODELS_GPT_4_TEMPERATURE=0.1
+LLM_MODELS_GPT_4_MAX_TOKENS=2000
+LLM_MODELS_GPT_4_DESCRIPTION="Most capable model for complex tasks"
+
+LLM_MODELS_CLAUDE_4_SONNET_MODEL=claude_4_sonnet
+LLM_MODELS_CLAUDE_4_SONNET_TEMPERATURE=0.3
+LLM_MODELS_CLAUDE_4_SONNET_MAX_TOKENS=4000
+LLM_MODELS_CLAUDE_4_SONNET_DESCRIPTION="Anthropic's Claude 4 Sonnet model"
+```
+
+#### YAML Configuration Example
+
+```yaml
+revos:
+  client_id: "your_client_id"
+  client_secret: "your_client_secret"
+  token_url: "https://your-site.com/revo/oauth/token"
+  base_url: "https://your-site.com/revo/llm-api"
+
+llm_models:
+  models:
+    gpt-3.5-turbo:
+      model: "gpt-3.5-turbo"
+      temperature: 0.1
+      max_tokens: 1024
+      description: "Fast and cost-effective model for general tasks"
+    gpt-4:
+      model: "gpt-4"
+      temperature: 0.1
+      max_tokens: 2000
+      description: "Most capable model for complex tasks"
+    claude_4_sonnet:
+      model: "claude_4_sonnet"
+      temperature: 0.3
+      max_tokens: 4000
+      description: "Anthropic's Claude 4 Sonnet model"
+```
+
+### Custom Environment Variable Prefixes
+
+You can use custom prefixes to avoid conflicts with other applications:
+
+```python
+from revos import create_config_with_prefixes
+
+# Create configuration with custom prefixes
+config = create_config_with_prefixes(
+    revo_prefix="MY_API_",      # Instead of "REVOS_"
+    llm_prefix="AI_",           # Instead of "LLM_"
+    logging_prefix="APP_",      # Instead of "LOG_"
+    token_prefix="AUTH_",       # Instead of "TOKEN_"
+)
+
+# This will look for environment variables like:
+# MY_API_CLIENT_ID, MY_API_CLIENT_SECRET
+# AI_MODELS_GPT_4_MODEL, AI_MODELS_GPT_4_TEMPERATURE
+# APP_LOG_LEVEL, APP_LOG_FORMAT
+# AUTH_REFRESH_INTERVAL_MINUTES
+```
+
+### Benefits of Multiple Models Configuration
+
+1. **Flexibility**: Configure different models for different tasks
+2. **Environment Separation**: Use different models in dev, staging, and production
+3. **Conflict Avoidance**: Custom prefixes prevent conflicts with other applications
+4. **Easy Override**: Override default models with your own configurations
+5. **Scalability**: Add new models without changing code
 
 ## Support
 

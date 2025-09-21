@@ -13,7 +13,6 @@ from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from .api import RevosConfig
-from .llm import LLMConfig
 from .llm_models import LLMModelsConfig
 from .logging import LoggingConfig
 from .token import TokenManagerConfig
@@ -31,7 +30,6 @@ class RevosMainConfig(BaseSettings):
     
     # Nested configuration sections
     revos: RevosConfig = Field(default_factory=RevosConfig)
-    llm: LLMConfig = Field(default_factory=LLMConfig)
     llm_models: LLMModelsConfig = Field(default_factory=LLMModelsConfig)
     logging: LoggingConfig = Field(default_factory=LoggingConfig)
     token_manager: TokenManagerConfig = Field(default_factory=TokenManagerConfig)

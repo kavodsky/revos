@@ -8,6 +8,7 @@ with different settings and parameters.
 from typing import Dict, Optional, Any
 from pydantic import Field, BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from .env_parser import parse_models_from_env
 
 
 class LLMModelConfig(BaseModel):
@@ -112,6 +113,21 @@ class LLMModelsConfig(BaseSettings):
         },
         description="Dictionary of available LLM models"
     )
+    
+    def __init__(self, **kwargs):
+        """Initialize with custom environment parsing."""
+        super().__init__(**kwargs)
+        
+        # Parse models from environment variables
+        env_models = parse_models_from_env(
+            env_prefix="LLM_MODELS_",
+            env_file=kwargs.get('_env_file', '.env')
+        )
+        
+        # If environment models are found, use ONLY those (override defaults)
+        # If no environment models are found, use the hardcoded defaults
+        if env_models:
+            self.models = env_models
     
     def get_model(self, model_name: str) -> LLMModelConfig:
         """

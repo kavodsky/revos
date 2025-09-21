@@ -153,7 +153,7 @@ class TestLLMModelsConfig:
         assert isinstance(models, dict)
         assert "gpt-3.5-turbo" in models
         assert "gpt-4" in models
-        assert len(models) == 4
+        assert len(models) == 5  # Updated to match current default models
     
     def test_add_model(self):
         """Test adding a new model."""
@@ -249,7 +249,6 @@ class TestRevosMainConfig:
             
             assert config.revos.client_id == "test-client-id"
             assert config.revos.client_secret == "test-client-secret"
-            assert isinstance(config.llm, LLMConfig)
             assert isinstance(config.llm_models, LLMModelsConfig)
             assert isinstance(config.logging, LoggingConfig)
             assert isinstance(config.token_manager, TokenManagerConfig)
@@ -257,20 +256,14 @@ class TestRevosMainConfig:
     def test_init_with_custom_values(self):
         """Test RevosMainConfig initialization with custom values."""
         config = RevosMainConfig(
-            revo={
+            revos={
                 "client_id": "custom-client-id",
                 "client_secret": "custom-client-secret"
-            },
-            llm={
-                "model": "gpt-4",
-                "temperature": 0.8
             }
         )
         
         assert config.revos.client_id == "custom-client-id"
         assert config.revos.client_secret == "custom-client-secret"
-        assert config.llm.model == "gpt-4"
-        assert config.llm.temperature == 0.8
 
 
 class TestConfigFactory:
@@ -281,7 +274,7 @@ class TestConfigFactory:
         config = create_config_with_prefixes(
             revo_prefix="CUSTOM_REVOS_",
             llm_prefix="CUSTOM_LLM_",
-            revo={
+            revos={
                 "client_id": "test-client-id",
                 "client_secret": "test-client-secret"
             }
@@ -332,13 +325,9 @@ class TestConfigFileLoading:
     def test_load_yaml_config(self):
         """Test loading configuration from YAML file."""
         config_data = {
-            "revo": {
+            "revos": {
                 "client_id": "yaml-client-id",
                 "client_secret": "yaml-client-secret"
-            },
-            "llm": {
-                "model": "gpt-4",
-                "temperature": 0.8
             }
         }
         
@@ -351,21 +340,15 @@ class TestConfigFileLoading:
             
             assert config.revos.client_id == "yaml-client-id"
             assert config.revos.client_secret == "yaml-client-secret"
-            assert config.llm.model == "gpt-4"
-            assert config.llm.temperature == 0.8
         finally:
             os.unlink(temp_file)
     
     def test_load_json_config(self):
         """Test loading configuration from JSON file."""
         config_data = {
-            "revo": {
+            "revos": {
                 "client_id": "json-client-id",
                 "client_secret": "json-client-secret"
-            },
-            "llm": {
-                "model": "gpt-4",
-                "temperature": 0.8
             }
         }
         
@@ -378,15 +361,13 @@ class TestConfigFileLoading:
             
             assert config.revos.client_id == "json-client-id"
             assert config.revos.client_secret == "json-client-secret"
-            assert config.llm.model == "gpt-4"
-            assert config.llm.temperature == 0.8
         finally:
             os.unlink(temp_file)
     
     def test_load_config_from_file_function(self):
         """Test load_config_from_file function."""
         config_data = {
-            "revo": {
+            "revos": {
                 "client_id": "function-client-id",
                 "client_secret": "function-client-secret"
             }

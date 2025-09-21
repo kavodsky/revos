@@ -31,12 +31,28 @@ class TestLangChainExtractor:
         self.settings_mock.revos.client_id = "test-client-id"
         self.settings_mock.revos.client_secret = "test-client-secret"
         self.settings_mock.revos.base_url = "https://test.com/api"
-        self.settings_mock.llm.model = "gpt-3.5-turbo"
-        self.settings_mock.llm.temperature = 0.1
-        self.settings_mock.llm.max_tokens = 1000
-        self.settings_mock.llm.top_p = 1.0
-        self.settings_mock.llm.frequency_penalty = 0.0
-        self.settings_mock.llm.presence_penalty = 0.0
+        
+        # Mock multiple models configuration
+        self.settings_mock.llm_models = Mock()
+        self.settings_mock.llm_models.models = {
+            "gpt-3.5-turbo": Mock(
+                model="gpt-3.5-turbo",
+                temperature=0.1,
+                max_tokens=1000,
+                top_p=1.0,
+                frequency_penalty=0.0,
+                presence_penalty=0.0
+            ),
+            "gpt-4": Mock(
+                model="gpt-4",
+                temperature=0.1,
+                max_tokens=2000,
+                top_p=1.0,
+                frequency_penalty=0.0,
+                presence_penalty=0.0
+            )
+        }
+        self.settings_mock.llm_models.get_model.return_value = self.settings_mock.llm_models.models["gpt-3.5-turbo"]
     
     def test_init_requires_model_name(self):
         """Test that LangChainExtractor requires model_name."""
@@ -46,11 +62,14 @@ class TestLangChainExtractor:
         with pytest.raises(ValueError, match="model_name is required"):
             LangChainExtractor("")
     
-    @patch('revos.llm.tools.get_revos_token')
+    @patch('revos.llm.tools.RevosTokenManager')
     @patch('revos.llm.tools.ChatOpenAI')
-    def test_init_success(self, mock_chat_openai, mock_get_token):
+    def test_init_success(self, mock_chat_openai, mock_token_manager_class):
         """Test successful LangChainExtractor initialization."""
-        mock_get_token.return_value = "test-token"
+        mock_token_manager = Mock()
+        mock_token_manager.get_token.return_value = "test-token"
+        mock_token_manager_class.return_value = mock_token_manager
+        
         mock_llm = Mock()
         mock_chat_openai.return_value = mock_llm
         
@@ -62,10 +81,12 @@ class TestLangChainExtractor:
             assert extractor.llm == mock_llm
             mock_chat_openai.assert_called_once()
     
-    @patch('revos.llm.tools.get_revos_token')
-    def test_init_with_custom_name(self, mock_get_token):
+    @patch('revos.llm.tools.RevosTokenManager')
+    def test_init_with_custom_name(self, mock_token_manager_class):
         """Test LangChainExtractor initialization with custom name."""
-        mock_get_token.return_value = "test-token"
+        mock_token_manager = Mock()
+        mock_token_manager.get_token.return_value = "test-token"
+        mock_token_manager_class.return_value = mock_token_manager
         
         with patch('revos.llm.tools.get_settings', return_value=self.settings_mock):
             with patch('revos.llm.tools.ChatOpenAI'):
@@ -73,25 +94,30 @@ class TestLangChainExtractor:
                 
                 assert extractor.name == "my_custom_extractor"
     
-    @patch('revos.llm.tools.get_revos_token')
-    def test_init_auth_failure(self, mock_get_token):
+    @patch('revos.llm.tools.RevosTokenManager')
+    def test_init_auth_failure(self, mock_token_manager_class):
         """Test LangChainExtractor initialization with auth failure."""
-        mock_get_token.side_effect = Exception("Authentication failed")
+        mock_token_manager = Mock()
+        mock_token_manager.get_token.side_effect = Exception("Authentication failed")
+        mock_token_manager_class.return_value = mock_token_manager
         
         with patch('revos.llm.tools.get_settings', return_value=self.settings_mock):
             with pytest.raises(RuntimeError, match="Cannot initialize LangChainExtractor"):
                 LangChainExtractor("gpt-3.5-turbo")
     
-    @patch('revos.llm.tools.get_revos_token')
+    @patch('revos.llm.tools.RevosTokenManager')
     @patch('revos.llm.tools.ChatOpenAI')
-    def test_init_with_multiple_models_config(self, mock_chat_openai, mock_get_token):
+    def test_init_with_multiple_models_config(self, mock_chat_openai, mock_token_manager_class):
         """Test LangChainExtractor initialization with multiple models config."""
-        mock_get_token.return_value = "test-token"
+        mock_token_manager = Mock()
+        mock_token_manager.get_token.return_value = "test-token"
+        mock_token_manager_class.return_value = mock_token_manager
         mock_llm = Mock()
         mock_chat_openai.return_value = mock_llm
         
         # Add llm_models to settings
         self.settings_mock.llm_models = Mock()
+        self.settings_mock.llm_models.models = {"gpt-4": Mock()}
         self.settings_mock.llm_models.get_model.return_value = Mock(
             model="gpt-4",
             temperature=0.8,
@@ -107,20 +133,26 @@ class TestLangChainExtractor:
             assert extractor.model_name == "gpt-4"
             self.settings_mock.llm_models.get_model.assert_called_once_with("gpt-4")
     
-    def test_get_current_model(self):
+    @patch('revos.llm.tools.RevosTokenManager')
+    def test_get_current_model(self, mock_token_manager_class):
         """Test get_current_model method."""
+        mock_token_manager = Mock()
+        mock_token_manager.get_token.return_value = "test-token"
+        mock_token_manager_class.return_value = mock_token_manager
+        
         with patch('revos.llm.tools.get_settings', return_value=self.settings_mock):
-            with patch('revos.llm.tools.get_revos_token', return_value="test-token"):
-                with patch('revos.llm.tools.ChatOpenAI'):
-                    extractor = LangChainExtractor("gpt-4")
-                    
-                    assert extractor.get_current_model() == "gpt-4"
+            with patch('revos.llm.tools.ChatOpenAI'):
+                extractor = LangChainExtractor("gpt-4")
+                
+                assert extractor.get_current_model() == "gpt-4"
     
-    @patch('revos.llm.tools.get_revos_token')
+    @patch('revos.llm.tools.RevosTokenManager')
     @patch('revos.llm.tools.ChatOpenAI')
-    def test_extract_structured_data_success(self, mock_chat_openai, mock_get_token):
+    def test_extract_structured_data_success(self, mock_chat_openai, mock_token_manager_class):
         """Test successful structured data extraction."""
-        mock_get_token.return_value = "test-token"
+        mock_token_manager = Mock()
+        mock_token_manager.get_token.return_value = "test-token"
+        mock_token_manager_class.return_value = mock_token_manager
         mock_llm = Mock()
         mock_response = Mock()
         mock_response.content = '{"task": "test", "result": "success", "confidence": 0.95}'
@@ -140,11 +172,13 @@ class TestLangChainExtractor:
             assert result.result == "success"
             assert result.confidence == 0.95
     
-    @patch('revos.llm.tools.get_revos_token')
+    @patch('revos.llm.tools.RevosTokenManager')
     @patch('revos.llm.tools.ChatOpenAI')
-    def test_extract_structured_data_failure(self, mock_chat_openai, mock_get_token):
+    def test_extract_structured_data_failure(self, mock_chat_openai, mock_token_manager_class):
         """Test structured data extraction failure."""
-        mock_get_token.return_value = "test-token"
+        mock_token_manager = Mock()
+        mock_token_manager.get_token.return_value = "test-token"
+        mock_token_manager_class.return_value = mock_token_manager
         mock_llm = Mock()
         mock_llm.ainvoke = AsyncMock(side_effect=Exception("LLM call failed"))
         mock_chat_openai.return_value = mock_llm
@@ -159,11 +193,13 @@ class TestLangChainExtractor:
                     target_class=MockResult
                 )
     
-    @patch('revos.llm.tools.get_revos_token')
+    @patch('revos.llm.tools.RevosTokenManager')
     @patch('revos.llm.tools.ChatOpenAI')
-    def test_extract_async_success(self, mock_chat_openai, mock_get_token):
+    def test_extract_async_success(self, mock_chat_openai, mock_token_manager_class):
         """Test successful async extraction."""
-        mock_get_token.return_value = "test-token"
+        mock_token_manager = Mock()
+        mock_token_manager.get_token.return_value = "test-token"
+        mock_token_manager_class.return_value = mock_token_manager
         mock_llm = Mock()
         mock_response = Mock()
         mock_response.content = '{"task": "async test", "result": "async success", "confidence": 0.9}'
@@ -213,18 +249,20 @@ class TestLLMFunctions:
         result = get_langchain_extractor("gpt-4")
         
         assert result == mock_extractor
-        mock_extractor_class.assert_called_once_with(model_name="gpt-4")
+        mock_extractor_class.assert_called_once_with(model_name="gpt-4", settings_instance=None)
     
-    @patch('revos.llm.tools.get_revos_token')
+    @patch('revos.llm.tools.RevosTokenManager')
     @patch('revos.llm.tools.LangChainExtractor')
     @patch('revos.llm.tools.get_settings')
-    def test_get_langchain_extractor_caching(self, mock_get_settings, mock_extractor_class, mock_get_token):
+    def test_get_langchain_extractor_caching(self, mock_get_settings, mock_extractor_class, mock_token_manager_class):
         """Test that get_langchain_extractor caches extractors."""
         # Clear the cache first
         from revos.llm.tools import _langchain_extractors
         _langchain_extractors.clear()
         
-        mock_get_token.return_value = "test-token"
+        mock_token_manager = Mock()
+        mock_token_manager.get_token.return_value = "test-token"
+        mock_token_manager_class.return_value = mock_token_manager
         mock_extractor = Mock()
         mock_extractor_class.return_value = mock_extractor
         
@@ -341,11 +379,13 @@ class TestLLMFunctions:
 class TestLLMIntegration:
     """Integration tests for LLM functionality."""
     
-    @patch('revos.llm.tools.get_revos_token')
+    @patch('revos.llm.tools.RevosTokenManager')
     @patch('revos.llm.tools.ChatOpenAI')
-    def test_full_extraction_workflow(self, mock_chat_openai, mock_get_token):
+    def test_full_extraction_workflow(self, mock_chat_openai, mock_token_manager_class):
         """Test complete extraction workflow."""
-        mock_get_token.return_value = "test-token"
+        mock_token_manager = Mock()
+        mock_token_manager.get_token.return_value = "test-token"
+        mock_token_manager_class.return_value = mock_token_manager
         mock_llm = Mock()
         mock_response = Mock()
         mock_response.content = '{"task": "integration test", "result": "workflow success", "confidence": 0.98}'
@@ -356,12 +396,20 @@ class TestLLMIntegration:
         settings_mock.revos.client_id = "test-client-id"
         settings_mock.revos.client_secret = "test-client-secret"
         settings_mock.revos.base_url = "https://test.com/api"
-        settings_mock.llm.model = "gpt-3.5-turbo"
-        settings_mock.llm.temperature = 0.1
-        settings_mock.llm.max_tokens = 1000
-        settings_mock.llm.top_p = 1.0
-        settings_mock.llm.frequency_penalty = 0.0
-        settings_mock.llm.presence_penalty = 0.0
+        
+        # Mock multiple models configuration
+        settings_mock.llm_models = Mock()
+        settings_mock.llm_models.models = {
+            "gpt-3.5-turbo": Mock(
+                model="gpt-3.5-turbo",
+                temperature=0.1,
+                max_tokens=1000,
+                top_p=1.0,
+                frequency_penalty=0.0,
+                presence_penalty=0.0
+            )
+        }
+        settings_mock.llm_models.get_model.return_value = settings_mock.llm_models.models["gpt-3.5-turbo"]
         
         with patch('revos.llm.tools.get_settings', return_value=settings_mock):
             # Create extractor

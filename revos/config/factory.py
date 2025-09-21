@@ -10,7 +10,6 @@ from pydantic import Field
 from pydantic_settings import SettingsConfigDict
 
 from .api import RevosConfig
-from .llm import LLMConfig
 from .llm_models import LLMModelsConfig
 from .logging import LoggingConfig
 from .token import TokenManagerConfig
@@ -37,6 +36,9 @@ def create_config_with_prefixes(
     Returns:
         RevosMainConfig instance with custom prefixes
         
+    Raises:
+        ValueError: If any prefixes are the same (to avoid variable name conflicts)
+        
     Example:
         # Use custom prefixes
         config = create_config_with_prefixes(
@@ -47,9 +49,19 @@ def create_config_with_prefixes(
         
         # This will look for environment variables like:
         # MY_API_CLIENT_ID, MY_API_CLIENT_SECRET
-        # AI_MODEL, AI_TEMPERATURE
+        # AI_GPT_4_MODEL, AI_GPT_4_TEMPERATURE
         # LOG_LEVEL, LOG_FORMAT
     """
+    # Validate that all prefixes are different to avoid variable name conflicts
+    prefixes = [revo_prefix, llm_prefix, logging_prefix, token_prefix]
+    if len(set(prefixes)) != len(prefixes):
+        duplicates = [prefix for prefix in prefixes if prefixes.count(prefix) > 1]
+        raise ValueError(
+            f"All prefixes must be different to avoid variable name conflicts. "
+            f"Found duplicate prefixes: {set(duplicates)}. "
+            f"Provided: revo='{revo_prefix}', llm='{llm_prefix}', "
+            f"logging='{logging_prefix}', token='{token_prefix}'"
+        )
     # Create custom config classes with modified prefixes
     class CustomRevosConfig(RevosConfig):
         model_config = SettingsConfigDict(
@@ -60,14 +72,6 @@ def create_config_with_prefixes(
             extra="ignore"
         )
     
-    class CustomLLMConfig(LLMConfig):
-        model_config = SettingsConfigDict(
-            env_prefix=llm_prefix,
-            env_file=".env",
-            env_file_encoding="utf-8",
-            case_sensitive=False,
-            extra="ignore"
-        )
     
     class CustomLoggingConfig(LoggingConfig):
         model_config = SettingsConfigDict(
@@ -89,17 +93,32 @@ def create_config_with_prefixes(
     
     class CustomLLMModelsConfig(LLMModelsConfig):
         model_config = SettingsConfigDict(
-            env_prefix="LLM_MODELS_",
+            env_prefix=llm_prefix,
             env_file=".env",
             env_file_encoding="utf-8",
             case_sensitive=False,
             extra="ignore"
         )
+        
+        def __init__(self, **kwargs):
+            """Initialize with custom environment parsing using the custom prefix."""
+            super().__init__(**kwargs)
+            
+            # Parse models from environment variables using the custom prefix
+            from .env_parser import parse_models_from_env
+            env_models = parse_models_from_env(
+                env_prefix=llm_prefix,
+                env_file=kwargs.get('_env_file', '.env')
+            )
+            
+            # If environment models are found, use ONLY those (override defaults)
+            # If no environment models are found, use the hardcoded defaults
+            if env_models:
+                self.models = env_models
     
     # Create the main config with custom nested configs
     class CustomRevosMainConfig(RevosMainConfig):
         revos: CustomRevosConfig = Field(default_factory=CustomRevosConfig)
-        llm: CustomLLMConfig = Field(default_factory=CustomLLMConfig)
         llm_models: CustomLLMModelsConfig = Field(default_factory=CustomLLMModelsConfig)
         logging: CustomLoggingConfig = Field(default_factory=CustomLoggingConfig)
         token_manager: CustomTokenManagerConfig = Field(default_factory=CustomTokenManagerConfig)
@@ -112,8 +131,6 @@ def create_config_with_prefixes(
             if env_file:
                 if 'revos' not in kwargs:
                     kwargs['revos'] = CustomRevosConfig(_env_file=env_file)
-                if 'llm' not in kwargs:
-                    kwargs['llm'] = CustomLLMConfig(_env_file=env_file)
                 if 'llm_models' not in kwargs:
                     kwargs['llm_models'] = CustomLLMModelsConfig(_env_file=env_file)
                 if 'logging' not in kwargs:
@@ -143,10 +160,6 @@ def create_minimal_config(**kwargs) -> RevosMainConfig:
             token_url=kwargs.get('token_url', 'https://your-site.com/revo/oauth/token'),
             base_url=kwargs.get('base_url', 'https://your-site.com/revo/llm-api')
         ),
-        llm=LLMConfig(
-            model=kwargs.get('model', 'gpt-3.5-turbo'),
-            temperature=kwargs.get('temperature', 0.7)
-        ),
         logging=LoggingConfig(
             level=kwargs.get('log_level', 'INFO')
         ),
@@ -173,11 +186,6 @@ def create_development_config(**kwargs) -> RevosMainConfig:
             token_buffer_minutes=10,  # Longer buffer for dev
             max_retries=5,  # More retries for dev
             request_timeout=60  # Longer timeout for dev
-        ),
-        llm=LLMConfig(
-            model=kwargs.get('model', 'gpt-4'),
-            temperature=kwargs.get('temperature', 0.8),
-            max_tokens=kwargs.get('max_tokens', 2000)
         ),
         logging=LoggingConfig(
             level='DEBUG',
@@ -212,11 +220,6 @@ def create_production_config(**kwargs) -> RevosMainConfig:
             token_buffer_minutes=5,  # Shorter buffer for prod
             max_retries=3,  # Standard retries for prod
             request_timeout=30  # Standard timeout for prod
-        ),
-        llm=LLMConfig(
-            model=kwargs.get('model', 'gpt-3.5-turbo'),
-            temperature=kwargs.get('temperature', 0.1),  # Lower temperature for prod
-            max_tokens=kwargs.get('max_tokens', 1000)
         ),
         logging=LoggingConfig(
             level='WARNING',

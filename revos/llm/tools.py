@@ -43,15 +43,18 @@ class LangChainExtractor:
             # Get token from Revos using custom token manager
             token = self.token_manager.get_token()
             
-            # Get LLM configuration
-            if (self.model_name and hasattr(self.settings, 'llm_models') and 
-                self.model_name in self.settings.llm_models.models):
-                # Use specific model from multiple models configuration
-                llm_config = self.settings.llm_models.get_model(self.model_name)
-            else:
-                # Use default single LLM configuration
-                llm_config = self.settings.llm
+            # Get LLM configuration from multiple models
+            if not self.model_name:
+                raise ValueError("Model name is required")
             
+            if not hasattr(self.settings, 'llm_models'):
+                raise ValueError("Multiple models configuration not available")
+            
+            if self.model_name not in self.settings.llm_models.models:
+                raise ValueError(f"Model '{self.model_name}' not found in available models: {list(self.settings.llm_models.models.keys())}")
+            
+            # Use specific model from multiple models configuration
+            llm_config = self.settings.llm_models.get_model(self.model_name)
             revo_config = self.settings.revos
             
             self.llm = ChatOpenAI(
@@ -79,7 +82,18 @@ class LangChainExtractor:
             self.token_manager.invalidate_token()
             token = self.token_manager.get_token(force_refresh=True, use_fallback=use_fallback)
             
-            llm_config = self.settings.llm
+            # Get LLM configuration from multiple models
+            if not self.model_name:
+                raise ValueError("Model name is required")
+            
+            if not hasattr(self.settings, 'llm_models'):
+                raise ValueError("Multiple models configuration not available")
+            
+            if self.model_name not in self.settings.llm_models.models:
+                raise ValueError(f"Model '{self.model_name}' not found in available models: {list(self.settings.llm_models.models.keys())}")
+            
+            # Use specific model from multiple models configuration
+            llm_config = self.settings.llm_models.get_model(self.model_name)
             revo_config = self.settings.revos
             
             self.llm = ChatOpenAI(
