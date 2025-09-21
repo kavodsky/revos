@@ -24,7 +24,7 @@ class TokenRefreshManager:
     validation and error handling.
     """
     
-    def __init__(self, refresh_interval_minutes: int = 45):
+    def __init__(self, refresh_interval_minutes: int = 45, settings_instance=None):
         """
         Initialize the token refresh manager.
 
@@ -32,9 +32,11 @@ class TokenRefreshManager:
             refresh_interval_minutes: Token refresh interval in minutes.
                 Defaults to 45 minutes to provide a good balance between
                 security and performance.
+            settings_instance: Optional settings instance to use. If None, uses global settings.
         """
         self.refresh_interval = refresh_interval_minutes * 60  # Convert to seconds
         self.last_refresh = None
+        self.settings_instance = settings_instance
 
     def should_refresh_token(self) -> bool:
         """
@@ -85,8 +87,13 @@ class TokenRefreshManager:
             logger.info("Starting token refresh process...")
             
             # Invalidate current tokens to force refresh
-            from ..auth.tokens import invalidate_revos_token
-            invalidate_revos_token()
+            if self.settings_instance:
+                from ..auth.core import RevosTokenManager
+                token_manager = RevosTokenManager(settings_instance=self.settings_instance)
+                token_manager.invalidate_token()
+            else:
+                from ..auth.tokens import invalidate_revos_token
+                invalidate_revos_token()
             
             # Test token acquisition without LLM calls
             if self._test_token_acquisition():
@@ -122,9 +129,14 @@ class TokenRefreshManager:
         try:
             logger.debug("Testing token acquisition...")
             
-            # Try to get a fresh token
-            from ..auth.tokens import get_revos_token
-            token = get_revos_token(force_refresh=True)
+            # Try to get a fresh token using custom settings if available
+            if self.settings_instance:
+                from ..auth.core import RevosTokenManager
+                token_manager = RevosTokenManager(settings_instance=self.settings_instance)
+                token = token_manager.get_token(force_refresh=True)
+            else:
+                from ..auth.tokens import get_revos_token
+                token = get_revos_token(force_refresh=True)
             
             # Validate token
             if token and isinstance(token, str) and len(token) > 0:

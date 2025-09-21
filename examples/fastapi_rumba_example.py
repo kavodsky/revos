@@ -114,9 +114,8 @@ async def lifespan(app: FastAPI):
         rumba_config = RumbaConfig()
         
         # Initialize token manager with background refresh
-        token_manager = TokenManager(
-            refresh_interval_minutes=rumba_config.revos_config.token_manager.refresh_interval_minutes
-        )
+        # The refresh interval will be automatically taken from the settings
+        token_manager = TokenManager(settings_instance=rumba_config.revos_config)
         
         # Start background token refresh service
         await token_manager.start_background_service()

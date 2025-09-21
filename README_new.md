@@ -85,9 +85,6 @@ import asyncio
 # Create token manager with background refresh
 token_manager = TokenManager(refresh_interval_minutes=45)
 
-# Or with custom settings (refresh interval taken from config)
-token_manager = TokenManager(settings_instance=config)
-
 # Start background token refresh service
 async def main():
     await token_manager.start_background_service()

@@ -28,7 +28,7 @@ class BackgroundTokenManager:
     the main application flow.
     """
     
-    def __init__(self, refresh_interval_minutes: int = 45):
+    def __init__(self, refresh_interval_minutes: int = 45, settings_instance=None):
         """
         Initialize the background token manager.
 
@@ -36,8 +36,9 @@ class BackgroundTokenManager:
             refresh_interval_minutes: Token refresh interval in minutes.
                 Defaults to 45 minutes to provide a good balance between
                 security and performance.
+            settings_instance: Optional settings instance to use. If None, uses global settings.
         """
-        self.refresh_manager = TokenRefreshManager(refresh_interval_minutes)
+        self.refresh_manager = TokenRefreshManager(refresh_interval_minutes, settings_instance)
         self.lock = threading.Lock()
         self._background_task: Optional[asyncio.Task] = None
         self._running = False

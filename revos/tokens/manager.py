@@ -37,17 +37,23 @@ class TokenManager:
     2. Background periodic refresh to maintain token validity
     """
 
-    def __init__(self, refresh_interval_minutes: int = 45):
+    def __init__(self, refresh_interval_minutes: int = None, settings_instance=None):
         """
         Initialize the token manager with refresh interval configuration.
 
         Args:
             refresh_interval_minutes: Token refresh interval in minutes.
-                Defaults to 45 minutes to provide a good balance between
-                security and performance.
+                If None, will use the value from settings_instance or default to 45 minutes.
+            settings_instance: Optional settings instance to use. If None, uses global settings.
         """
-        self.refresh_manager = TokenRefreshManager(refresh_interval_minutes)
-        self.background_manager = BackgroundTokenManager(refresh_interval_minutes)
+        # Use refresh interval from settings if not explicitly provided
+        if refresh_interval_minutes is None and settings_instance is not None:
+            refresh_interval_minutes = settings_instance.token_manager.refresh_interval_minutes
+        elif refresh_interval_minutes is None:
+            refresh_interval_minutes = 45  # Default value
+        
+        self.refresh_manager = TokenRefreshManager(refresh_interval_minutes, settings_instance)
+        self.background_manager = BackgroundTokenManager(refresh_interval_minutes, settings_instance)
         self.lock = threading.Lock()
 
     def should_refresh_token(self) -> bool:

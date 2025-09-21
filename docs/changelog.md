@@ -8,21 +8,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Comprehensive MkDocs documentation
-- FastAPI integration examples
-- Multiple LLM model support
-- Background token management
-- Comprehensive test suite
+- Enhanced monitoring and alerting capabilities
+- Performance metrics and tracking
+- Additional real-world usage examples
+
+## [0.1.7] - 2024-12-20
+
+### Added
+- **Automatic Config Reading**: TokenManager now automatically uses refresh_interval_minutes from custom settings
+- **Comprehensive Documentation**: New organized documentation structure with separate guides
+- **Enhanced Testing**: 13 new tests for background token refresh with custom settings
+- **New Documentation Files**:
+  - `docs/llm-models.md` - LLM models configuration guide
+  - `docs/fastapi-examples.md` - FastAPI integration examples
+  - `docs/custom-prefixes.md` - Custom environment variable prefixes guide
+  - `docs/token-management.md` - Advanced token management guide
 
 ### Changed
-- Renamed from `revo` to `revos` for consistency
-- Updated all configuration classes and methods
-- Improved error handling with traceback output
+- **Simplified TokenManager API**: No need to manually pass refresh_interval_minutes when using custom settings
+- **Documentation Restructure**: README reduced from ~1800 lines to ~150 lines for better readability
+- **Improved Examples**: Updated all examples to use simplified API
+- **Better Organization**: Related documentation grouped in dedicated files
 
 ### Fixed
-- Token refresh logic without LLM calls
-- Async test configuration issues
-- Mock configuration in test suite
+- **Critical Bug**: Background token refresh process now properly uses custom settings
+- **Validation Errors**: Fixed "Field required" errors when using custom environment variable prefixes
+- **Background Services**: Resolved issues with background services not using custom configurations
+- **Documentation Links**: Fixed internal documentation links and navigation
+
+### Technical Improvements
+- **Smart Configuration**: TokenManager automatically reads settings from custom configurations
+- **Explicit Override**: Can still explicitly pass refresh_interval_minutes to override config
+- **Fallback Behavior**: Graceful fallback to defaults when no config is provided
+- **Better Error Handling**: More descriptive error messages for configuration issues
+- **Enhanced Reliability**: Background services work consistently across different configurations
+
+### Testing
+- **New Test Suite**: Added comprehensive tests for background token refresh with custom settings
+- **Better Coverage**: Tests ensure background process works correctly with custom configurations
+- **Integration Tests**: End-to-end testing of complete workflows
+- **All Tests Pass**: 36 existing tests + 13 new tests = 49 total tests passing
 
 ## [0.1.6] - 2024-12-19
 
