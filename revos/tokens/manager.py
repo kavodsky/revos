@@ -16,6 +16,7 @@ from typing import Optional
 
 from .refresh import TokenRefreshManager
 from .background import BackgroundTokenManager
+from .observer import set_global_config, set_global_token_manager
 from ..auth.exceptions import RevosTokenError
 
 # Re-export for backward compatibility
@@ -55,6 +56,11 @@ class TokenManager:
         self.refresh_manager = TokenRefreshManager(refresh_interval_minutes, settings_instance)
         self.background_manager = BackgroundTokenManager(refresh_interval_minutes, settings_instance)
         self.lock = threading.Lock()
+        
+        # Set global config and TokenManager for extractors to use
+        if settings_instance is not None:
+            set_global_config(settings_instance)
+            set_global_token_manager(self)
 
     def should_refresh_token(self) -> bool:
         """
@@ -73,6 +79,20 @@ class TokenManager:
             bool: True if refresh was successful, False otherwise
         """
         return self.refresh_manager.refresh_extractor()
+    
+    def get_token(self) -> str:
+        """
+        Get the current authentication token.
+        
+        Returns:
+            str: The current authentication token
+        """
+        # Use the refresh manager's token acquisition test to get a fresh token
+        token = self.refresh_manager._test_token_acquisition()
+        if token is None:
+            raise RevosTokenError("Failed to acquire authentication token")
+        return token
+    
 
     async def start_background_refresh(self) -> None:
         """

@@ -27,11 +27,13 @@ async def lifespan(app: FastAPI):
         # The refresh interval will be automatically taken from the config
         token_manager = TokenManager(settings_instance=config)
         
-        # Start background token refresh service
-        await token_manager.start_background_service()
+        # Create extractors (they get tokens immediately via Observer Pattern)
+        # Extractors automatically pick up config from environment variables!
+        extractor = get_langchain_extractor("gpt-4")  # Gets token instantly
         
-        # Initialize extractor
-        extractor = get_langchain_extractor("gpt-4")
+        # Start background token refresh service
+        # All extractors will automatically get updated tokens!
+        await token_manager.start_background_service()
         
         print("✅ FastAPI services started successfully")
         
@@ -111,9 +113,9 @@ async def lifespan(app: FastAPI):
         # Start background token refresh service
         await token_manager.start_background_service()
         
-        # Initialize extractor with RUMBA configuration
+        # Initialize extractor with RUMBA configuration (gets token instantly)
         extractor = get_langchain_extractor(
-            model_name=rumba_config.revos_config.llm.model,
+            model_name="gpt-4",  # Gets token instantly via Observer Pattern
             settings_instance=rumba_config.revos_config
         )
         

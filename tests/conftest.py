@@ -99,7 +99,7 @@ def mock_llm_response():
 
 @pytest.fixture(autouse=True)
 def clean_environment():
-    """Clean environment variables before each test."""
+    """Clean environment variables and global state before each test."""
     # Store original environment
     original_env = os.environ.copy()
     
@@ -108,11 +108,35 @@ def clean_environment():
     for var in revo_vars:
         del os.environ[var]
     
+    # Clear global state
+    try:
+        from revos.tokens.observer import set_global_config, get_global_notifier
+        from revos.llm.tools import _langchain_extractors
+        set_global_config(None)
+        notifier = get_global_notifier()
+        notifier.clear_observers()
+        _langchain_extractors.clear()
+    except ImportError:
+        # Ignore import errors during test collection
+        pass
+    
     yield
     
     # Restore original environment
     os.environ.clear()
     os.environ.update(original_env)
+    
+    # Clear global state again
+    try:
+        from revos.tokens.observer import set_global_config, get_global_notifier
+        from revos.llm.tools import _langchain_extractors
+        set_global_config(None)
+        notifier = get_global_notifier()
+        notifier.clear_observers()
+        _langchain_extractors.clear()
+    except ImportError:
+        # Ignore import errors during test collection
+        pass
 
 
 @pytest.fixture

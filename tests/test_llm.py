@@ -240,16 +240,18 @@ class TestLLMFunctions:
         with pytest.raises(ValueError, match="model_name is required"):
             get_langchain_extractor("")
     
+    @patch('revos.llm.tools.get_settings')
     @patch('revos.llm.tools.LangChainExtractor')
-    def test_get_langchain_extractor_success(self, mock_extractor_class):
+    def test_get_langchain_extractor_success(self, mock_extractor_class, mock_get_settings):
         """Test successful get_langchain_extractor call."""
         mock_extractor = Mock()
         mock_extractor_class.return_value = mock_extractor
+        mock_get_settings.return_value = Mock()
         
         result = get_langchain_extractor("gpt-4")
         
         assert result == mock_extractor
-        mock_extractor_class.assert_called_once_with(model_name="gpt-4", settings_instance=None)
+        mock_extractor_class.assert_called_once_with(model_name="gpt-4", settings_instance=mock_get_settings.return_value)
     
     @patch('revos.llm.tools.RevosTokenManager')
     @patch('revos.llm.tools.LangChainExtractor')

@@ -5,6 +5,23 @@
 
 ## 🎉 Major Improvements
 
+### 🔄 Observer Pattern for Automatic Token Updates
+- **Automatic Extractor Updates**: LangChainExtractor instances automatically get updated tokens when TokenManager refreshes them
+- **No Manual Intervention**: Extractors update themselves without additional API calls
+- **Background-Safe**: Perfect for FastAPI background token management scenarios
+- **Efficient Architecture**: Uses Observer Pattern for clean, scalable token management
+
+**New Capability:**
+```python
+# Extractors automatically register for token updates
+extractor1 = get_langchain_extractor("gpt_4", settings_instance=config)
+extractor2 = get_langchain_extractor("claude_4", settings_instance=config)
+
+# When TokenManager refreshes tokens, ALL extractors get updated automatically!
+token_manager = TokenManager(settings_instance=config)
+await token_manager.start_background_service()
+```
+
 ### 🔧 Enhanced TokenManager Configuration
 - **Automatic Config Reading**: `TokenManager` now automatically uses `refresh_interval_minutes` from custom settings
 - **Simplified API**: No need to manually pass refresh interval when using custom configurations
@@ -190,3 +207,4 @@ Thanks to all contributors and users who provided feedback and helped identify t
 ---
 
 **Full Changelog**: [v0.1.6...v0.1.7](https://github.com/yourusername/revo/compare/v0.1.6...v0.1.7)
+

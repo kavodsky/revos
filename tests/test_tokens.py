@@ -82,7 +82,7 @@ class TestTokenRefreshManager:
         
         result = self.refresh_manager._test_token_acquisition()
         
-        assert result is True
+        assert result == "valid-token"
         mock_get_token.assert_called_once_with(force_refresh=True)
     
     @patch('revos.auth.tokens.get_revos_token')
@@ -92,7 +92,7 @@ class TestTokenRefreshManager:
         
         result = self.refresh_manager._test_token_acquisition()
         
-        assert result is False
+        assert result is None
     
     @patch('revos.auth.tokens.get_revos_token')
     def test_test_token_acquisition_empty_token(self, mock_get_token):
@@ -101,7 +101,7 @@ class TestTokenRefreshManager:
         
         result = self.refresh_manager._test_token_acquisition()
         
-        assert result is False
+        assert result is None
     
     @patch('revos.auth.tokens.get_revos_token')
     def test_test_token_acquisition_exception(self, mock_get_token):
@@ -110,7 +110,7 @@ class TestTokenRefreshManager:
         
         result = self.refresh_manager._test_token_acquisition()
         
-        assert result is False
+        assert result is None
 
 
 class TestBackgroundTokenManager:

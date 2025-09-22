@@ -8,6 +8,7 @@ The Revos library provides comprehensive token management with:
 
 - **Automatic token refresh** with configurable intervals
 - **Background token refresh** for continuous operation
+- **Automatic extractor updates** via Observer Pattern
 - **Custom settings support** for different environments
 - **Robust error handling** with retry logic and fallback mechanisms
 - **Token lifecycle management** with expiration tracking
@@ -105,6 +106,115 @@ token_manager = TokenManager(settings_instance=config)
     await token_manager.stop_background_service()
 
 asyncio.run(main())
+```
+
+## Automatic Extractor Updates (Observer Pattern)
+
+The Revos library implements a **perfect Observer Pattern** that automatically updates all extractors when tokens are refreshed. This ensures that your LangChain extractors always use the latest authentication tokens with **zero duplicate requests**.
+
+### How It Works
+
+1. **Immediate Token Provision**: When extractors register as observers, they get tokens instantly
+2. **Zero Duplicate Requests**: Extractors never make their own token requests when TokenManager is running
+3. **Automatic Registration**: Extractors automatically register as observers upon creation
+4. **Token Refresh Notification**: When TokenManager refreshes tokens, all registered extractors are notified
+5. **Efficient Updates**: Extractors update their LLM instances with the new tokens without additional API calls
+
+### Basic Usage
+
+```python
+from revos import TokenManager, get_langchain_extractor
+import asyncio
+
+async def main():
+    # Create token manager
+    token_manager = TokenManager(settings_instance=config)
+    
+    # Create extractors (they get tokens immediately via Observer Pattern)
+    # Extractors automatically pick up config from environment variables!
+    extractor1 = get_langchain_extractor("gpt-4")  # Gets token instantly
+    extractor2 = get_langchain_extractor("claude-4")  # Gets token instantly
+    
+    # Start background token refresh
+    await token_manager.start_background_service()
+    
+    # Your application code here
+    # All extractors automatically use fresh tokens!
+    
+    # Stop background service
+    await token_manager.stop_background_service()
+
+asyncio.run(main())
+```
+
+### FastAPI Integration
+
+```python
+from fastapi import FastAPI
+from revos import TokenManager, get_langchain_extractor
+
+app = FastAPI()
+
+# Global variables for token manager and extractors
+token_manager = None
+extractors = {}
+
+@app.on_event("startup")
+async def startup_event():
+    global token_manager, extractors
+    
+    # Create token manager
+    token_manager = TokenManager(settings_instance=config)
+    
+    # Create extractors (they get tokens immediately via Observer Pattern)
+    # Extractors automatically pick up config from environment variables!
+    extractors["gpt-4"] = get_langchain_extractor("gpt-4")  # Gets token instantly
+    extractors["claude-4"] = get_langchain_extractor("claude-4")  # Gets token instantly
+    
+    # Start background token refresh
+    await token_manager.start_background_service()
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    global token_manager
+    if token_manager:
+        await token_manager.stop_background_service()
+
+@app.post("/extract")
+async def extract_data(data: dict):
+    # Use extractors - they automatically have fresh tokens!
+    result = await extractors["gpt_4"].extract(PersonInfo, prompt_template, **data)
+    return result
+```
+
+### Key Benefits
+
+- **⚡ Zero Duplicate Requests**: Extractors never make their own token requests
+- **🚀 Immediate Availability**: Extractors get tokens instantly upon registration
+- **🔄 Automatic Updates**: Extractors get new tokens without manual intervention
+- **🛡️ Background-Safe**: Perfect for FastAPI background token management
+- **📈 Multiple Extractors**: All get updated simultaneously
+- **🎯 Efficient Architecture**: Single TokenManager serves all extractors
+- **🏗️ Clean Architecture**: Observer pattern is elegant and scalable
+
+### Manual Token Refresh
+
+If you need to manually refresh tokens and update extractors:
+
+```python
+from revos import TokenManager, get_langchain_extractor
+
+# Create token manager and extractors
+token_manager = TokenManager(settings_instance=config)
+extractor = get_langchain_extractor("gpt_4", settings_instance=config)
+
+# Manually refresh tokens (this will notify all extractors)
+success = token_manager.refresh_extractor()
+
+if success:
+    print("Tokens refreshed and all extractors updated!")
+else:
+    print("Token refresh failed")
 ```
 
 ## Token Lifecycle Management

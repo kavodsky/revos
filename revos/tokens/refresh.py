@@ -96,10 +96,15 @@ class TokenRefreshManager:
                 invalidate_revos_token()
             
             # Test token acquisition without LLM calls
-            if self._test_token_acquisition():
+            new_token = self._test_token_acquisition()
+            if new_token:
                 # Record successful refresh
                 self.last_refresh = datetime.now()
                 logger.info(f"Token refresh successful at {self.last_refresh}")
+                
+                # Notify all observers with the new token
+                self._notify_observers(new_token)
+                
                 return True
             else:
                 logger.error("Token refresh failed: token acquisition test failed")
@@ -110,7 +115,7 @@ class TokenRefreshManager:
             logger.error(f"Token refresh traceback: {traceback.format_exc()}")
             raise RevosTokenError(f"Token refresh failed: {e}")
 
-    def _test_token_acquisition(self) -> bool:
+    def _test_token_acquisition(self) -> Optional[str]:
         """
         Test token acquisition without executing LLM calls.
 
@@ -119,7 +124,7 @@ class TokenRefreshManager:
         on authentication token validation.
 
         Returns:
-            bool: True if token acquisition succeeds, False otherwise
+            Optional[str]: The acquired token if successful, None otherwise
 
         Test Process:
             1. Attempt to acquire a fresh token
@@ -141,15 +146,15 @@ class TokenRefreshManager:
             # Validate token
             if token and isinstance(token, str) and len(token) > 0:
                 logger.debug("Token acquisition test successful")
-                return True
+                return token
             else:
                 logger.warning("Token acquisition test failed: invalid token format")
-                return False
+                return None
                 
         except Exception as e:
             logger.warning(f"Token acquisition test failed with exception: {e}")
             logger.debug(f"Token acquisition test traceback: {traceback.format_exc()}")
-            return False
+            return None
     
     def get_last_refresh_time(self) -> Optional[datetime]:
         """
@@ -159,4 +164,20 @@ class TokenRefreshManager:
             Optional[datetime]: Last refresh timestamp, or None if no refresh has occurred
         """
         return self.last_refresh
+    
+    def _notify_observers(self, new_token: str) -> None:
+        """
+        Notify all registered observers with the new token.
+        
+        Args:
+            new_token: The new authentication token to send to observers
+        """
+        try:
+            # Import and use the global notifier
+            from .observer import notify_all_observers
+            notify_all_observers(new_token)
+            
+        except Exception as e:
+            logger.error(f"Failed to notify observers: {e}")
+            logger.error(f"Observer notification traceback: {traceback.format_exc()}")
 

@@ -14,13 +14,15 @@ from langchain_core.messages import HumanMessage
 from ..auth.tokens import get_revos_token, invalidate_revos_token
 from ..auth.core import RevosTokenManager
 from ..config import get_settings
+from ..tokens.observer import TokenRefreshObserver, register_observer, get_global_config, get_global_token_manager
 
 logger = logging.getLogger(__name__)
+
 
 T = TypeVar('T', bound=BaseModel)
 
 
-class LangChainExtractor:
+class LangChainExtractor(TokenRefreshObserver):
     """Extracts structured data using LangChain and LLM."""
     
     def __init__(self, model_name: str, settings_instance=None, name=None):
@@ -32,17 +34,44 @@ class LangChainExtractor:
         self.name = name or f"extractor_{model_name}"
         self.llm = None
         
-        # Create a token manager with the custom settings
-        self.token_manager = RevosTokenManager(settings_instance=self.settings)
+        # Check if we have a global config (TokenManager is running)
+        global_config = get_global_config()
+        if global_config is not None:
+            # TokenManager is running - use global config and register as observer
+            self.settings = global_config
+            self.token_manager = None  # No need for own token manager
+            register_observer(self)
+            logger.debug(f"Registered {self.name} for token refresh notifications")
+        else:
+            # Running standalone - create our own token manager
+            self.token_manager = RevosTokenManager(settings_instance=self.settings)
+            logger.debug(f"TokenManager not running - {self.name} will work standalone")
         
         self._initialize_llm()
     
     def _initialize_llm(self):
         """Initialize the LLM client."""
         try:
-            # Get token from Revos using custom token manager
-            token = self.token_manager.get_token()
-            
+            # Get token based on mode
+            if self.token_manager is not None:
+                # Standalone mode - use our own token manager
+                token = self.token_manager.get_token()
+                self._create_llm_with_token(token)
+            else:
+                # Global TokenManager mode - wait for observer notification
+                # The LLM will be created when on_token_refreshed is called
+                logger.debug(f"{self.name} registered as observer - waiting for token notification")
+                # Don't create LLM here - it will be created via on_token_refreshed
+                
+        except Exception as e:
+            logger.error(f"Failed to initialize LangChain LLM: {e}")
+            logger.debug(f"LLM initialization traceback: {traceback.format_exc()}")
+            # If token acquisition fails, don't create the extractor at all
+            raise RuntimeError(f"Cannot initialize LangChainExtractor: {e}") from e
+    
+    def _create_llm_with_token(self, token: str) -> None:
+        """Create the LLM instance with the provided token."""
+        try:
             # Get LLM configuration from multiple models
             if not self.model_name:
                 raise ValueError("Model name is required")
@@ -67,12 +96,11 @@ class LangChainExtractor:
                 api_key=token,
                 base_url=revo_config.base_url
             )
-            logger.info("LangChain LLM initialized successfully")
+            logger.info(f"LangChain LLM initialized successfully for {self.name}")
         except Exception as e:
-            logger.error(f"Failed to initialize LangChain LLM: {e}")
-            logger.debug(f"LLM initialization traceback: {traceback.format_exc()}")
-            # If token acquisition fails, don't create the extractor at all
-            raise RuntimeError(f"Cannot initialize LangChainExtractor: {e}") from e
+            logger.error(f"Failed to create LLM with token: {e}")
+            logger.debug(f"LLM creation traceback: {traceback.format_exc()}")
+            raise RuntimeError(f"Cannot create LLM: {e}") from e
     
     def _refresh_llm(self, use_fallback: bool = False):
         """Refresh LLM with new token"""
@@ -112,10 +140,38 @@ class LangChainExtractor:
             logger.error(f"LLM refresh traceback: {traceback.format_exc()}")
             self.llm = None
     
+    def on_token_refreshed(self, new_token: str) -> None:
+        """
+        Observer method called when a new token is available.
+        
+        This method efficiently updates the LLM instance with the new token
+        without making additional API calls, since the token is already available.
+        
+        Args:
+            new_token: The new authentication token to use
+        """
+        logger.info(f"Updating {self.name} with new token")
+        
+        try:
+            # Use the shared LLM creation method
+            self._create_llm_with_token(new_token)
+            logger.info(f"Successfully updated {self.name} with new token")
+            
+        except Exception as e:
+            logger.error(f"Failed to update {self.name} with new token: {e}")
+            logger.error(f"Token update traceback: {traceback.format_exc()}")
+            # Keep the existing LLM instance if update fails
+            logger.warning(f"Keeping existing LLM instance for {self.name}")
+    
     async def extract(self, target: Type[T], prompt: PromptTemplate, **kwargs) -> T:
         """Extract structured data using LLM."""
         if not self.llm:
-            raise RuntimeError("LLM not available. Cannot perform extraction.")
+            if self.token_manager is None:
+                # Global TokenManager mode - waiting for first token notification
+                raise RuntimeError("LLM not available. Waiting for first token from global TokenManager. Please ensure TokenManager is running and has acquired a token.")
+            else:
+                # Standalone mode - should have LLM
+                raise RuntimeError("LLM not available. Cannot perform extraction.")
         
         try:
             # Create output parser
@@ -269,11 +325,25 @@ def get_langchain_extractor(model_name: str, settings_instance=None) -> LangChai
         # Use with custom settings (e.g., RUMBA_ prefix)
         config = create_config_with_prefixes(revo_prefix="RUMBA_")
         extractor = get_langchain_extractor('claude_4_sonnet', settings_instance=config)
+        
+        # Simple approach - extractors automatically pick up config from env
+        # No need to pass settings_instance to extractors
+        token_manager = TokenManager(settings_instance=config)
+        extractor = get_langchain_extractor('claude_4_sonnet')  # Auto-detects from env!
     """
     if not model_name:
         raise ValueError("model_name is required to get LangChainExtractor")
     
     global _langchain_extractors
+    
+    # Extractors automatically pick up config from global config or environment
+    if settings_instance is None:
+        # Try to get global config first, then fall back to environment
+        global_config = get_global_config()
+        if global_config is not None:
+            settings_instance = global_config
+        else:
+            settings_instance = get_settings()
     
     # Create extractor if it doesn't exist
     if model_name not in _langchain_extractors:
