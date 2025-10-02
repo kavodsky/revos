@@ -1,6 +1,7 @@
 # Revos
 
-A Python library for Revos API authentication and LangChain-based LLM tools with support for multiple LLM models and robust configuration management.
+A Python library for **custom** LLM APIs authentication and LangChain-based LLM tools with support for multiple LLM models and robust configuration management.
+In this text and examples we use definition **Revos API**, which is a placeholder for any custom LLM API provider requiring customisation of authentication logic, auth token management.
 
 ## Why Choose Revos? 🚀
 
